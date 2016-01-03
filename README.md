@@ -26,7 +26,7 @@ EP-Guide
 
 # 业务流程图
 
-* 见[流程图]()
+* 见[流程图](https://github.com/Neutree/EP-Guide/blob/master/Doc/Visio-EP-Guide场景功能流程图.pdf)
 
 # 实现说明
 
@@ -46,7 +46,7 @@ EP-Guide
 * 语言：java
 * 系统：Android
 * IDE：Android Studio
-* 框架：MVC
+* 框架模式：MVC
 * API：Target:23 Min:15
 
 # 托管地址
