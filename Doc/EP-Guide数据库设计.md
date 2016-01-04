@@ -8,11 +8,13 @@
 
 #####车库表(garage)
 - garage_ID (主键)
+- garage_name (车库名)
 - isFull (是否已满)
 
 #####车位表(parking_spaces)
 - ID (主键)
 - park_ID （停车位ID）
+- park_spaceName (车位名)
 - garage_ID （车库ID）
 - status (车位状态,空闲or占用?)
 - start_time (停车开始时刻)
