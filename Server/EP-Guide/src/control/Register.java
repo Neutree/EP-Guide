@@ -13,7 +13,7 @@ import config.ConstantCode;
 import database.DBOpreate;
 import tools.Encrypt;
 
-public class Login extends HttpServlet{
+public class Register extends HttpServlet{
 	
 	public void doGet(HttpServletRequest request,HttpServletResponse response) throws ServletException,IOException{
 		doPost(request, response);
@@ -24,6 +24,7 @@ public class Login extends HttpServlet{
 		String username=null,password=null,receiveData;//用户名，密码，客户端接收的json数据
 		int action;//所需操作的命令字
 		int result=0;//操作结果
+		String car_ID;
 		String token=null;//用户token
 		JSONObject jsonData = new JSONObject();
 		JSONObject backnews=new JSONObject();
@@ -59,6 +60,7 @@ public class Login extends HttpServlet{
 			}
 			username=jsonData.getString("username");
 			password=jsonData.getString("password");
+			car_ID=jsonData.getString("car_ID");
 			password=Encrypt.encrypt(password+"&A-402");//sha1加密
 			System.out.println("Info , 密码 SHA1加密后： "+password);
 			// 2.2  判断账号密码是否正确

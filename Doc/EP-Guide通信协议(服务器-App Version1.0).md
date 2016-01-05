@@ -13,15 +13,15 @@ _ _ _
 
 - 功能：App登录服务器
 - 描述：客户端用MD5对密码进行加密，服务器将发来的的密码进行验证，并生成新的token
-- 请求地址(url):ep-guide/api/xxx.java
-- 提交格式：{"action":1, "data":"{...}"};
+- 请求地址(url):http://www.doubleeggs.com:8080/EP-Guide/login
+- 提交格式：{"action":"1001", "username":"dandan","password":"gg"}
   {"action":"1001","username":"dandan","password":"123456","token":"5200"}
   提交命令字：1001-请求登录
   提交参数：username,password
 - 返回格式：{"result":"xxx","token":"xxx"};
   返回命令字：2001-登录失败
 　　　　　　  8001-登录成功
-  返回参数：username,token
+  返回参数：result,token
 - 使用方法：解析JSON对象，先获取result，如果为2001，则data里数据为空
 
 #####用户注册
@@ -29,14 +29,14 @@ _ _ _
 
 - 功能：App向服务器进行注册
 - 描述：客户端用MD5对密码进行加密，服务器将发来的的密码进行验证，并生成新的token
-- 请求地址(url):ep-guide/api/xxx.java
-- 提交格式：{"action":xxx, "data":"{...}"};
+- 请求地址(url):http://www.doubleeggs.com:8080/EP-Guide/register
+- 提交格式：{"action":"1002", "username":"dan","password":"gg","car_ID":"渝B666668"}
   提交命令字：1002-请求注册
   提交参数：username,password,car_ID(车牌号)
 - 返回格式：{"result":xxx, "data":"{…}"};
   返回命令字：2002-失败
 　　　　　　8002-成功
-  返回参数：username,token
+  返回参数：token
 - 使用方法：解析JSON对象，先获取result，如果为2002，则代表注册失败，data里数据为空
 
 #####二次登录(token)

@@ -27,24 +27,11 @@ public class DBHelper {
 		try {
 			con=DriverManager.getConnection(uri,dblogName,dbpassword);
 			sql=con.createStatement();
-			preState = con.prepareStatement(sqlexcu);
-			//preState.executeQuery(); 
-		    //rs = preState.executeQuery(); 	
+			preState = con.prepareStatement(sqlexcu);	
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public boolean excuteSql(String sqlexcu) {
-		try {
-			preState = con.prepareStatement(sqlexcu);
-			
-			preState.executeQuery(); 
-		} catch (Exception e) {
-			
-			e.printStackTrace();
-			return false;
-		}
-		return true;
-	}
+
 }
