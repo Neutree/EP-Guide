@@ -103,6 +103,14 @@ public:
 	                  unsigned char *pKey    ,unsigned char *pSnr);	
 	
 	
+	//////////////////////////
+	///写数据到PICC的某块中
+	///@param addr 块地址
+	///@param pData 要写入的数据（0~16个字节）
+	///@retval 是否写成功
+	/////////////////////////
+	bool PcdWrite(unsigned char addr,unsigned char *pData);
+	
 
 };
 

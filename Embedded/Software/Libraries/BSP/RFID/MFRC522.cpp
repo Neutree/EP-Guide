@@ -349,4 +349,38 @@ bool MFRC522::PcdAuthState(unsigned char auth_mode,unsigned char addr,
     return status;
 }
 
+//////////////////////////
+///写数据到PICC的某块中
+///@param addr 块地址
+///@param pData 要写入的数据（0~16个字节）
+///@retval 是否写成功
+/////////////////////////
+bool MFRC522::PcdWrite(unsigned char addr,unsigned char *pData)
+{
+	char status;
+    unsigned int  unLen;
+    unsigned char i,ucComMF522Buf[MFRC522_MaxReceiveLen]; 
+    
+    ucComMF522Buf[0] = MFRC522_PICC_WRITE;
+    ucComMF522Buf[1] = addr;
+    CalulateCRC16(ucComMF522Buf,2,&ucComMF522Buf[2]);
+ 
+    status = PcdComPicc(MFRC522_PCD_TRANSCEIVE,ucComMF522Buf,4,ucComMF522Buf,&unLen);
 
+    if (!status || (unLen != 4) || ((ucComMF522Buf[0] & 0x0F) != 0x0A))
+    {   status = false;   }
+        
+    if (status)
+    {
+        //memcpy(ucComMF522Buf, pData, 16);
+        for (i=0; i<16; i++)
+        {    ucComMF522Buf[i] = *(pData+i);   }
+        CalulateCRC16(ucComMF522Buf,16,&ucComMF522Buf[16]);
+
+        status = PcdComPicc(MFRC522_PCD_TRANSCEIVE,ucComMF522Buf,18,ucComMF522Buf,&unLen);
+        if (!status || (unLen != 4) || ((ucComMF522Buf[0] & 0x0F) != 0x0A))
+        {   status = false;   }
+    }
+    
+    return status;
+}
