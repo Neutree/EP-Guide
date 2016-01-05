@@ -364,7 +364,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPEREPH_DRIVER,STM32F10X_MD</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Libraries\BSP\USART;..\..\Libraries\Math;..\..\System</IncludePath>
+              <IncludePath>..\..\Libraries\BSP\USART;..\..\Libraries\Math;..\..\System;..\..\Libraries\BSP\Delay;..\..\Libraries\BSP\RFID;..\..\Libraries\BSP\GPIO;..\..\App</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -412,6 +412,21 @@
               <FileType>8</FileType>
               <FilePath>..\..\Libraries\BSP\USART\USART.cpp</FilePath>
             </File>
+            <File>
+              <FileName>Delay.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\Libraries\BSP\Delay\Delay.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>MFRC522.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\Libraries\BSP\RFID\MFRC522.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>GPIO.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\Libraries\BSP\GPIO\GPIO.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -431,6 +446,16 @@
         </Group>
         <Group>
           <GroupName>Math</GroupName>
+        </Group>
+        <Group>
+          <GroupName>App</GroupName>
+          <Files>
+            <File>
+              <FileName>App.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\App\App.cpp</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>
