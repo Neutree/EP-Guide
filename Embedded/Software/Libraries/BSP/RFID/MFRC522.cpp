@@ -258,3 +258,65 @@ bool MFRC522::PcdAntiColl(unsigned char *pSnr)
     SetBitMask(MFRC522_CollReg,0x80);
     return status;
 }
+
+
+///////////////////
+///选择PICC
+///@param pSnr IC卡的序列号 4个字节
+///@retval 选择成功与否
+///////////////////
+bool MFRC522::PcdSelect(unsigned char *pSnr)
+{
+	char status;
+    unsigned char i;
+    unsigned int  unLen;
+    unsigned char ucComMF522Buf[MFRC522_MaxReceiveLen]; 
+    
+    ucComMF522Buf[0] = MFRC522_PICC_ANTICOLL1;
+    ucComMF522Buf[1] = 0x70;
+    ucComMF522Buf[6] = 0;
+    for (i=0; i<4; i++)
+    {
+    	ucComMF522Buf[i+2] = *(pSnr+i);
+    	ucComMF522Buf[6]  ^= *(pSnr+i);
+    }
+    CalulateCRC16(ucComMF522Buf,7,&ucComMF522Buf[7]);
+  
+    ClearBitMask(MFRC522_Status2Reg,0x08);
+
+    status = PcdComPicc(MFRC522_PCD_TRANSCEIVE,ucComMF522Buf,9,ucComMF522Buf,&unLen);
+    
+    if (status && (unLen == 0x18))
+    {   status = true;  }
+    else
+    {   status = false;    }
+
+    return status;
+}
+////////////////////////
+///CRC16校验计算
+////////////////////////
+void MFRC522::CalulateCRC16(unsigned char *pIndata,unsigned char len,unsigned char *pOutData)
+{
+	unsigned char i,n;
+    ClearBitMask(MFRC522_DivIrqReg,0x04);
+    WriteRawRC(MFRC522_CommandReg,MFRC522_PCD_IDLE);
+    SetBitMask(MFRC522_FIFOLevelReg,0x80);
+    for (i=0; i<len; i++)
+       WriteRawRC(MFRC522_FIFODataReg, *(pIndata+i));
+	
+    WriteRawRC(MFRC522_CommandReg, MFRC522_PCD_CALCCRC);
+    i = 0xFF;
+    do 
+    {
+        n = ReadRawRC(MFRC522_DivIrqReg);
+        i--;
+    }
+    while ((i!=0) && !(n&0x04));
+    pOutData[0] = ReadRawRC(MFRC522_CRCResultRegL);
+    pOutData[1] = ReadRawRC(MFRC522_CRCResultRegM);
+}
+
+
+
+

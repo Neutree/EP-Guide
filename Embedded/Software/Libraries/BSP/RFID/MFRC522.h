@@ -37,7 +37,11 @@ private:
 	///设置MFRC522的寄存器的特定位，即把mask参数中的为1的位设置到reg中
 	////////////////////////
 	void SetBitMask(unsigned char reg,unsigned char mask);
-
+	
+	////////////////////////
+	///CRC16校验计算
+	////////////////////////
+	void CalulateCRC16(unsigned char *pIndata,unsigned char len,unsigned char *pOutData);
 public:
 	/////////////////////
 	///构造函数
@@ -72,6 +76,13 @@ public:
 	///////////////////
 	bool PcdAntiColl(unsigned char *pSnr);
 	
+	///////////////////
+	///选择PICC
+	///@param pSnr IC卡的序列号 4个字节
+	///@retval 选择成功与否
+	///////////////////
+	bool PcdSelect(unsigned char *pSnr);
+	
 	
 	bool PcdComPicc(unsigned char Command,unsigned char *pInData,unsigned char InLenByte,
 	                                       unsigned char *pOutData, unsigned int  *pOutLenBit);
@@ -80,7 +91,7 @@ public:
 
 /////////////////////////////////////////
 ///
-#define MFRC522_MaxReceiveLen 18   //大于IC卡的块大小。IC卡的一个块的大小为16个字节，所以理论上大于16就行了
+#define MFRC522_MaxReceiveLen 18   //用来当缓冲区和临时变量使用的
 /////////////////////////////////////////
 
 
