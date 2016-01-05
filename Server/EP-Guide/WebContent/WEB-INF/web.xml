@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--XML声明 -->
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:web="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+  <servlet>
+    <servlet-name>HandleRegister</servlet-name>
+    <servlet-class>control.Register</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HandleRegister</servlet-name>
+    <url-pattern>/register</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>HandleLogin</servlet-name>
+    <servlet-class>control.Login</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HandleLogin</servlet-name>
+    <url-pattern>/login</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>HandleLogout</servlet-name>
+    <servlet-class>control.Logout</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HandleLogout</servlet-name>
+    <url-pattern>/logout</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>HandleChangePwd</servlet-name>
+    <servlet-class>user.ChangePwd</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HandleChangePwd</servlet-name>
+    <url-pattern>/changePwd</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>HandleInquireUserInf</servlet-name>
+    <servlet-class>user.InquireUserInf</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HandleInquireUserInf</servlet-name>
+    <url-pattern>/inquireUserInf</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>HandleGetWeekPlan</servlet-name>
+    <servlet-class>user.GetWeekPlan</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HandleGetWeekPlan</servlet-name>
+    <url-pattern>/getWeekPlan</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>HandleGetClass</servlet-name>
+    <servlet-class>user.GetClass</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HandleGetClass</servlet-name>
+    <url-pattern>/getClass</url-pattern>
+  </servlet-mapping>
+  
+</web-app>
