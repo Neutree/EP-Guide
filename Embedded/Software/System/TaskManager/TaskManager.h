@@ -1,25 +1,23 @@
 #ifndef _TASK_MANAGER_H_
 #define _TASK_MANAGER_H_
+
+extern "C"{
 #include "stm32f10x.h"
+void SysTick_Handler(void);
+}
 
 class TaskManager
 {
-private:
-	static double _new_time;		 //current updated time
-	static double _old_time;     //last updated time
 public:
-	static double _it_time;      //time = SysTick interrupt counter*1.8s
+	volatile static u32 _it_cnt;      //SysTick interrupt counter
 public:		
-	TaskManager();               //constructor
-	static double Time(void);    //get current time
+	TaskManager();
+	static double Time(void);
+	static void DelayUs(u16 nus);
+	static void DelayMs(u16 nms);
+	static void DelayS(u16 s);
 };
+
 extern TaskManager tskmgr;
-
-#define	MOD_ERROR  0x00
-#define	MOD_READY  0x01
-#define	MOD_BUSY   0x02
-#define	MOD_LOCK   0x04
-#define	MOD_UNLOCK 0x08
-
 
 #endif
