@@ -65,6 +65,14 @@ public:
 	////////////////////
 	bool PcdRequest(unsigned char whichTag,unsigned char *pTagType);
 	
+	///////////////////
+	///防冲撞
+	///@param pSnr 返回的卡片序列号 4字节
+	///@retval 是否成功
+	///////////////////
+	bool PcdAntiColl(unsigned char *pSnr);
+	
+	
 	bool PcdComPicc(unsigned char Command,unsigned char *pInData,unsigned char InLenByte,
 	                                       unsigned char *pOutData, unsigned int  *pOutLenBit);
 
@@ -103,6 +111,16 @@ public:
 #define MFRC522_PICC_RESTORE          0xC2               //调块数据到缓冲区
 #define MFRC522_PICC_TRANSFER         0xB0               //保存缓冲区中数据
 #define MFRC522_PICC_HALT             0x50               //休眠
+
+//////////////////////////////////////////////
+///Mifare_One卡类型枚举
+//////////////////////////////////////////////
+#define MFRC522_PICC_MIFARE_ULTRALIGHT       0x4400
+#define MFRC522_PICC_MIFARE_ONE_S50          0x0400
+#define MFRC522_PICC_MIFARE_ONE_S70          0x0200
+#define MFRC522_PICC_MIFARE_PRO_X            0x0800
+#define MFRC522_PICC_MIFARE_DESFIRE          0x4403
+
 
 /////////////////////////////////////////////////////////////////////
 //MF522 FIFO长度定义

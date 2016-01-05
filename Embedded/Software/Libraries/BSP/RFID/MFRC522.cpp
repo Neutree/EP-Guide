@@ -174,7 +174,7 @@ bool MFRC522::PcdComPicc(unsigned char Command,unsigned char *pDataToPicc,unsign
     do 
     {
         
-		if(TaskManager::Time()-timeOut > 1.027)
+		if(TaskManager::Time()-timeOut > 0.027)
 		{
 			i=1;//超时
 			break;
@@ -222,3 +222,39 @@ bool MFRC522::PcdComPicc(unsigned char Command,unsigned char *pDataToPicc,unsign
    return status;
 }
 
+///////////////////
+///防冲撞
+///@param pSnr 返回的卡片序列号 4字节
+///@retval 是否成功
+///////////////////
+bool MFRC522::PcdAntiColl(unsigned char *pSnr)
+{
+	bool status;
+    unsigned char i,snr_check=0;
+    unsigned int  unLen;
+    unsigned char ucComMF522Buf[MFRC522_MaxReceiveLen]; 
+    
+
+    ClearBitMask(MFRC522_Status2Reg,0x08);
+    WriteRawRC(MFRC522_BitFramingReg,0x00);
+    ClearBitMask(MFRC522_CollReg,0x80);
+ 
+    ucComMF522Buf[0] = MFRC522_PICC_ANTICOLL1;
+    ucComMF522Buf[1] = 0x20;
+
+    status = PcdComPicc(MFRC522_PCD_TRANSCEIVE,ucComMF522Buf,2,ucComMF522Buf,&unLen);
+
+    if (status)
+    {
+    	 for (i=0; i<4; i++)
+         {   
+             *(pSnr+i)  = ucComMF522Buf[i];
+             snr_check ^= ucComMF522Buf[i];
+         }
+         if (snr_check != ucComMF522Buf[i])
+         {   status = false;    }
+    }
+    
+    SetBitMask(MFRC522_CollReg,0x80);
+    return status;
+}

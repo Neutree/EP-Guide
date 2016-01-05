@@ -364,7 +364,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPEREPH_DRIVER,STM32F10X_MD</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Libraries\BSP\USART;..\..\Libraries\Math;..\..\System;..\..\Libraries\BSP\Delay;..\..\Libraries\BSP\RFID;..\..\Libraries\BSP\GPIO;..\..\App</IncludePath>
+              <IncludePath>..\..\Libraries\BSP\USART;..\..\Libraries\Math;..\..\System;..\..\Libraries\BSP\RFID;..\..\Libraries\BSP\GPIO;..\..\App;..\..\System\TaskManager</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -413,11 +413,6 @@
               <FilePath>..\..\Libraries\BSP\USART\USART.cpp</FilePath>
             </File>
             <File>
-              <FileName>Delay.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\Libraries\BSP\Delay\Delay.cpp</FilePath>
-            </File>
-            <File>
               <FileName>MFRC522.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\Libraries\BSP\RFID\MFRC522.cpp</FilePath>
@@ -441,6 +436,11 @@
               <FileName>Interrupt.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\System\Interrupt.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>TaskManager.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\System\TaskManager\TaskManager.cpp</FilePath>
             </File>
           </Files>
         </Group>
