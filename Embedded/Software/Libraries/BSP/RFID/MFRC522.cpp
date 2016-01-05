@@ -317,6 +317,36 @@ void MFRC522::CalulateCRC16(unsigned char *pIndata,unsigned char len,unsigned ch
     pOutData[1] = ReadRawRC(MFRC522_CRCResultRegM);
 }
 
+////////////////////////
+///验证卡片密码
+///@param auth_mode 验证密码模式 取值：
+///                                MFRC522_PICC_AUTHENT1A 验证A密匙
+///                                MFRC522_PICC_AUTHENT1B 验证B密匙
+///@param addr 块地址
+///@param pKey 密码，6个字节
+///@param pSnr 卡片序列号，4字节
+////////////////////////
+bool MFRC522::PcdAuthState(unsigned char auth_mode,unsigned char addr,
+				  unsigned char *pKey    ,unsigned char *pSnr)
+{
+	char status;
+    unsigned int  unLen;
+    unsigned char i,ucComMF522Buf[MFRC522_MaxReceiveLen]; 
 
+    ucComMF522Buf[0] = auth_mode;
+    ucComMF522Buf[1] = addr;
+    for (i=0; i<6; i++)
+    {    ucComMF522Buf[i+2] = *(pKey+i);   }
+    for (i=0; i<6; i++)
+    {    ucComMF522Buf[i+8] = *(pSnr+i);   }
+ //   memcpy(&ucComMF522Buf[2], pKey, 6); 
+ //   memcpy(&ucComMF522Buf[8], pSnr, 4); 
+    
+    status = PcdComPicc(MFRC522_PCD_AUTHENT,ucComMF522Buf,12,ucComMF522Buf,&unLen);
+    if (!status || (!(ReadRawRC(MFRC522_Status2Reg) & 0x08)))
+    {   status = false;   }
+    
+    return status;
+}
 
 

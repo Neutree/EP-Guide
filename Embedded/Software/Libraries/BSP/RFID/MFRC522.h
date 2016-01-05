@@ -38,6 +38,12 @@ private:
 	////////////////////////
 	void SetBitMask(unsigned char reg,unsigned char mask);
 	
+	//////////////////////////
+	///PCD和PICC通信
+	//////////////////////////
+	bool PcdComPicc(unsigned char Command,unsigned char *pInData,unsigned char InLenByte,
+	                                       unsigned char *pOutData, unsigned int  *pOutLenBit);
+
 	////////////////////////
 	///CRC16校验计算
 	////////////////////////
@@ -84,8 +90,19 @@ public:
 	bool PcdSelect(unsigned char *pSnr);
 	
 	
-	bool PcdComPicc(unsigned char Command,unsigned char *pInData,unsigned char InLenByte,
-	                                       unsigned char *pOutData, unsigned int  *pOutLenBit);
+	////////////////////////
+	///验证卡片密码
+	///@param auth_mode 验证密码模式 取值：
+	///                                MFRC522_PICC_AUTHENT1A 验证A密匙
+	///                                MFRC522_PICC_AUTHENT1B 验证B密匙
+	///@param addr 块地址
+	///@param pKey 密码，6个字节
+	///@param pSnr 卡片序列号，4字节
+	////////////////////////
+	bool PcdAuthState(unsigned char auth_mode,unsigned char addr,
+	                  unsigned char *pKey    ,unsigned char *pSnr);	
+	
+	
 
 };
 
