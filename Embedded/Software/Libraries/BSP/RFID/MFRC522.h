@@ -196,8 +196,9 @@ public:
 /////////////////////////////////////////////////////////////////////
 #define MFRC522_PICC_REQIDL           0x26               //寻天线区内未进入休眠状态
 #define MFRC522_PICC_REQALL           0x52               //寻天线区内全部卡
-#define MFRC522_PICC_ANTICOLL1        0x93               //防冲撞
-#define MFRC522_PICC_ANTICOLL2        0x95               //防冲撞
+#define MFRC522_PICC_ANTICOLL1        0x93               //防冲撞 代表 UID CL1（对于ID字节数大于等于1个字节的）
+#define MFRC522_PICC_ANTICOLL2        0x95               //防冲撞 代表 UID CL2（对于ID字节数大于4个字节的）
+#define MFRC522_PICC_ANTICOLL3        0x97               //防冲撞 代表 UID CL3（对于ID字节数大于6个字节的）
 #define MFRC522_PICC_AUTHENT1A        0x60               //验证A密钥
 #define MFRC522_PICC_AUTHENT1B        0x61               //验证B密钥
 #define MFRC522_PICC_READ             0x30               //读块

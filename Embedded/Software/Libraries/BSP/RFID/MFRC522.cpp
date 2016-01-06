@@ -157,6 +157,7 @@ bool MFRC522::PcdComPicc(unsigned char Command,unsigned char *pDataToPicc,unsign
     unsigned char lastBits;
     unsigned char n;
     unsigned int i;
+	char temp;
     switch (Command)
     {
        case MFRC522_PCD_AUTHENT:
@@ -199,7 +200,7 @@ bool MFRC522::PcdComPicc(unsigned char Command,unsigned char *pDataToPicc,unsign
 	      
     if (i==0)//没有超时
     {    
-		char temp=(ReadRawRC(MFRC522_ErrorReg));
+		temp=(ReadRawRC(MFRC522_ErrorReg));
          if(!(temp&0x1B))
          {
              status = true;
@@ -225,14 +226,27 @@ bool MFRC522::PcdComPicc(unsigned char Command,unsigned char *pDataToPicc,unsign
 					pDataInPcd[i] = ReadRawRC(MFRC522_FIFODataReg);
             }
          }
-         else
+         else//出错
             status = false;
+
         
    }
    
 
    SetBitMask(MFRC522_ControlReg,0x80);           // stop timer now
    WriteRawRC(MFRC522_CommandReg,MFRC522_PCD_IDLE); //取消当前命令的执行
+   
+   if(!status)
+   {
+	 if(temp&0x08 /*|| (n & irqEn & 0x01)*/)//检测到碰撞(或者超时)
+	 {
+		 char collReg = ReadRawRC(MFRC522_CollReg);//读出碰撞检测的寄存器中的值
+		 collReg&=0x1F;//获取发生碰撞的位置
+		
+	 }	   
+   }
+   
+
    return status;
 }
 
@@ -268,7 +282,6 @@ bool MFRC522::PcdAntiColl(unsigned char *pSnr)
          if (snr_check != ucComMF522Buf[i])
          {   status = false;    }
     }
-    
     SetBitMask(MFRC522_CollReg,0x80);
     return status;
 }
