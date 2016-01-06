@@ -120,6 +120,12 @@ public:
 	//////////////////////////
 	bool PcdRead(unsigned char addr,unsigned char *pData);
 	
+	
+	////////////////////////
+	///命令卡片进入睡眠状态
+	///@retval 睡眠是否成功
+	////////////////////////
+	bool PcdHalt(void);
 /*	
 	////////////////////////
 	///修改PICC块中的值（加法、减法）

@@ -412,6 +412,27 @@ bool MFRC522::PcdRead(unsigned char addr,unsigned char *pData)
     
     return status;
 }
+
+////////////////////////
+///命令卡片进入睡眠状态
+///@retval 睡眠是否成功
+////////////////////////
+bool MFRC522::PcdHalt(void)
+{
+   /* bool status;*/
+    unsigned int  unLen;
+    unsigned char ucComMF522Buf[MFRC522_MaxReceiveLen]; 
+
+    ucComMF522Buf[0] = MFRC522_PICC_HALT;
+    ucComMF522Buf[1] = 0;
+    CalulateCRC16(ucComMF522Buf,2,&ucComMF522Buf[2]);
+ 
+    /*status =*/ PcdComPicc(MFRC522_PCD_TRANSCEIVE,ucComMF522Buf,4,ucComMF522Buf,&unLen);
+
+    return true;
+}
+
+
 /*
 ////////////////////////
 ///修改PICC块中的值（加法、减法）
