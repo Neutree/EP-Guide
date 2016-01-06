@@ -62,7 +62,7 @@ SPI_Speed SPI::GetSpeed(void)
 			return SPI_SPEED_8;
 		case 3:
 			return SPI_SPEED_16;
-		case 7:
+		default:
 			return SPI_SPEED_256;
 	}
 }
