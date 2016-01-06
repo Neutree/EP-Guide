@@ -25,16 +25,23 @@ int main()
 	
 	while(1)
 	{
-		TaskManager::DelayMs(500);
+	//	TaskManager::DelayMs(500);
 		
 
-		if(rfid1.PcdRequest(MFRC522_PICC_REQALL,tagInfo))//寻到卡
+		if(rfid1.PcdRequest(MFRC522_PICC_REQIDL,tagInfo))//寻到卡
 		{
 			//com1.SendData(tagInfo,2);//显示卡类型
+			if(((u16)tagInfo[0]<<8|tagInfo[1])==MFRC522_PICC_MIFARE_ONE_S50)
+				com1<<"\nMIFARE-M1-S50 card detected!\n";
 			ledGreen.SetLevel(0);
 			if(rfid1.PcdAntiColl(tagInfo))//防冲撞成功(找到一张卡序列号)
 			{
-				//com1.SendData(tagInfo,4);//显示卡号
+				//显示ID
+				com1<<"Card ID:\t";
+				for(int i=0;i<4;++i)
+					com1<<tagInfo[i]<<"\t";
+				com1<<"\n";
+				
 				if(rfid1.PcdSelect(tagInfo))//选卡，卡号为前一步找到的卡号
 				{
 					
@@ -45,6 +52,10 @@ int main()
 							
 							if(rfid1.PcdRead(1,tagInfo))
 							{
+								com1<<"Read success,Data:\n";
+								for(u8 i=0;i<16;++i)
+									com1<<tagInfo[i]<<"\t";
+								com1<<"\n";
 								com1.SendData(tagInfo,16);//显示读出的块1的数据
 								if(rfid1.PcdHalt())
 									ledYellow.SetLevel(0);//点亮黄灯

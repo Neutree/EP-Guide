@@ -1,3 +1,18 @@
+/**
+  *
+  *@file MFRC522.h
+  *@author Neucrack(Neutree)
+  *@brief Driver of MFRC522(RFID PCD) for stm32f10x
+  *@copyright CQUT IOT LIB all right reserved
+  *@version   v1.0
+  *@date  v1.0 2016-01-06
+  *       latest update on 2016-01-06
+  *
+  *
+  *
+  */
+
+
 # ifndef __MFRC522_H_
 # define __MFRC522_H_
 
@@ -63,20 +78,29 @@ public:
 	///////////////////////
 	void PCDReset();
 	
+
+	//////////////////////////
+	///开启阅读器天线
+	//////////////////////////
 	void PcdAntennaOn();
 
+	//////////////////////////
+	///关闭阅读器天线
+	//////////////////////////
 	void PcdAntennaOff();
 
 
 	////////////////////
 	///寻卡
-	///@param whichTag  寻卡的方式
+	///@param whichTag  寻卡的方式 取值：
+	///                               MFRC522_PICC_REQIDL 寻天线区内未进入休眠状态
+	///                               MFRC522_PICC_REQALL 寻天线区内全部卡
 	///@param pTagType   存放寻到的卡片的类型（两个字节）
 	////////////////////
 	bool PcdRequest(unsigned char whichTag,unsigned char *pTagType);
 	
 	///////////////////
-	///防冲撞
+	///防冲撞寻卡号
 	///@param pSnr 返回的卡片序列号 4字节
 	///@retval 是否成功
 	///////////////////

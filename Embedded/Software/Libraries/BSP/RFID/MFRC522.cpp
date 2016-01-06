@@ -1,3 +1,18 @@
+/**
+  *
+  *@file MFRC522.h
+  *@author Neucrack(Neutree)
+  *@brief Driver of MFRC522(RFID PCD) for stm32f10x
+  *@copyright CQUT IOT LIB all right reserved
+  *@version   v1.0
+  *@date  v1.0 2016-01-06
+  *       latest update on 2016-01-06
+  *
+  *
+  *
+  */
+
+
 # include "MFRC522.h"
 
 
@@ -222,7 +237,7 @@ bool MFRC522::PcdComPicc(unsigned char Command,unsigned char *pDataToPicc,unsign
 }
 
 ///////////////////
-///防冲撞
+///防冲撞寻卡号
 ///@param pSnr 返回的卡片序列号 4字节
 ///@retval 是否成功
 ///////////////////
