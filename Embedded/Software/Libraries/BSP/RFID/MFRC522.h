@@ -106,12 +106,39 @@ public:
 	//////////////////////////
 	///写数据到PICC的某块中
 	///@param addr 块地址
-	///@param pData 要写入的数据（0~16个字节）
+	///@param pData 要写入的数据（16个字节）
 	///@retval 是否写成功
 	/////////////////////////
 	bool PcdWrite(unsigned char addr,unsigned char *pData);
 	
-
+	
+	//////////////////////////
+	///读取PICC中的一块的数据
+	///@param addr 块地址
+	///@param pData 存入块中的数据16个字节
+	///@retval 存数据是否成功
+	//////////////////////////
+	bool PcdRead(unsigned char addr,unsigned char *pData);
+	
+/*	
+	////////////////////////
+	///修改PICC块中的值（加法、减法）
+	///@param dd_mode 模式    取值：
+	///                            MFRC522_PICC_DECREMENT（减法）
+	///                            MFRC522_PICC_INCREMENT（加法）
+	///@param addr PICC块地址
+	///@param pValue 值
+	////////////////////////
+	bool PcdValue(unsigned char dd_mode,unsigned char addr,unsigned char *pValue);
+*/
+/*
+	//////////////////////////
+	///备份块到其它块
+	//////////////////////////
+	bool PcdBakValue(unsigned char sourceaddr, unsigned char goaladdr);
+*/	
+	
+	
 };
 
 /////////////////////////////////////////
@@ -124,12 +151,15 @@ public:
 //MF522命令字
 /////////////////////////////////////////////////////////////////////
 #define MFRC522_PCD_IDLE              0x00               //取消当前命令
-#define MFRC522_PCD_AUTHENT           0x0E               //验证密钥
-#define MFRC522_PCD_RECEIVE           0x08               //接收数据
-#define MFRC522_PCD_TRANSMIT          0x04               //发送数据
-#define MFRC522_PCD_TRANSCEIVE        0x0C               //发送并接收数据
-#define MFRC522_PCD_RESETPHASE        0x0F               //复位
-#define MFRC522_PCD_CALCCRC           0x03               //CRC计算
+#define MFRC522_PCD_CALCCRC           0x03               //激活CRC协处理器或执行自测试
+#define MFRC522_PCD_TRANSMIT          0x04               //发送FIFO缓冲区的命令
+#define MFRC522_PCD_NOCMDCHANGE       0x07               //无命令改变，用来修改命令寄存器的不同位，但有不触及其它命令，如掉电
+#define MFRC522_PCD_RECEIVE           0x08               //接收数据（激活接收电路）
+#define MFRC522_PCD_TRANSCEIVE        0x0C               //发送并接收数据（如果ControlReg的Initiator位被置为1，将FIFO缓冲区数据发送到天线并在完成后自动激活接收器电路，
+                                                         //                                      Initiator为0, 则激活接收天线）
+#define MFRC522_PCD_AUTHENT           0x0E               //执行读卡器的MIFARE标准认证
+#define MFRC522_PCD_RESETPHASE        0x0F               //复位MFRC522
+
 
 /////////////////////////////////////////////////////////////////////
 //Mifare_One卡片命令字
@@ -142,8 +172,8 @@ public:
 #define MFRC522_PICC_AUTHENT1B        0x61               //验证B密钥
 #define MFRC522_PICC_READ             0x30               //读块
 #define MFRC522_PICC_WRITE            0xA0               //写块
-#define MFRC522_PICC_DECREMENT        0xC0               //扣款
-#define MFRC522_PICC_INCREMENT        0xC1               //充值
+#define MFRC522_PICC_DECREMENT        0xC0               //扣款（减法）
+#define MFRC522_PICC_INCREMENT        0xC1               //充值（加法）
 #define MFRC522_PICC_RESTORE          0xC2               //调块数据到缓冲区
 #define MFRC522_PICC_TRANSFER         0xB0               //保存缓冲区中数据
 #define MFRC522_PICC_HALT             0x50               //休眠

@@ -12,7 +12,7 @@ MFRC522 rfid1(&com2,&rfidResetPin);
 //PICC默认密码(6个字节均为0xff)
 const unsigned char DefaultKey[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 const unsigned char data1[16] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
-
+const unsigned char data2[4]={1,0,0,0};
 unsigned char tagInfo[MFRC522_MaxReceiveLen];
 u8 temp[20];
 int main()
@@ -43,10 +43,16 @@ int main()
 					{
 						if(rfid1.PcdWrite(1,(u8*)data1))//向块1写入数据data1
 						{
-							ledYellow.SetLevel(0);
+							
+							if(rfid1.PcdRead(1,tagInfo))
+							{
+								ledYellow.SetLevel(0);//点亮黄灯
+								com1.SendData(tagInfo,16);//显示读出的块1的数据
+							}
+							else
+								ledYellow.SetLevel(1);//熄灭黄灯
 						}
-						else
-							ledYellow.SetLevel(1);
+						
 					}
 					
 				}
