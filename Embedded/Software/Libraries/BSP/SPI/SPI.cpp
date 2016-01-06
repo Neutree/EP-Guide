@@ -15,16 +15,14 @@
 ///////////////////////////
 ///Constructor for SPI 
 ///@param spiNumber choose which SPI to use 1(default) or 2
-///@param irqGpio interrupt GPIO when recieved data
-///@param irqPin  interrupt Pin when recieved data 
 ///@param if remap pin
 ///@param speed speed of SPI @see SPI_Speed default:SPI_SPEED_16
 ///@param firstBit the first bit of transfer LSB or MSB @see SPI_FirstBit  default:SPI_FirstBit_MSB_
 //////////////////////////
-SPI::SPI(SPI_TypeDef* spi,GPIO_TypeDef* irqGpio,uint16_t irqPin,bool remap,SPI_Speed speed,SPI_FirstBit firstBit)
+SPI::SPI(SPI_TypeDef* spi,bool remap,SPI_Speed speed,SPI_FirstBit firstBit)
 :mSPI(spi)
 {
-	Init(spi,irqGpio,irqPin,remap,speed,firstBit);
+	Init(spi,remap,speed,firstBit);
 }
 
 /////////////////////////////////////
@@ -70,18 +68,16 @@ SPI_Speed SPI::GetSpeed(void)
 ///////////////////////////
 ///Constructor for SPI 
 ///@param SPI choose which SPI to use SPI1(default) or SPI2
-///@param irqGpio interrupt GPIO when recieved data
-///@param irqPin  interrupt Pin when recieved data 
 ///@param if remap pin
 ///@param speed speed of SPI @see SPI_Speed default:SPI_SPEED_16
 ///@param firstBit the first bit of transfer LSB or MSB @see SPI_FirstBit  default:SPI_FirstBit_MSB_
 //////////////////////////
-void SPI::Init(SPI_TypeDef* spi,GPIO_TypeDef* irqGpio,uint16_t irqPin,bool remap,SPI_Speed speed,SPI_FirstBit firstBit)
+void SPI::Init(SPI_TypeDef* spi,bool remap,SPI_Speed speed,SPI_FirstBit firstBit)
 {
 	SPI_InitTypeDef  SPI_InitStructure;
 	GPIO_InitTypeDef GPIO_InitStructure;
-	uint16_t MOSI_Pin,MISO_Pin,SCK_Pin,NSS_Pin;
-	GPIO_TypeDef* SPI_GPIO,*NSS_GPIO;
+	uint16_t MOSI_Pin,MISO_Pin,SCK_Pin;
+	GPIO_TypeDef* SPI_GPIO;
 	//开启SPI所用引脚的时钟
 	if(mSPI==SPI2)
 	{
@@ -91,9 +87,9 @@ void SPI::Init(SPI_TypeDef* spi,GPIO_TypeDef* irqGpio,uint16_t irqPin,bool remap
 		MOSI_Pin = GPIO_Pin_15;
 		MISO_Pin = GPIO_Pin_14;
 		SCK_Pin  = GPIO_Pin_13;
-		NSS_Pin  = GPIO_Pin_12;
+		mNSS_Pin  = GPIO_Pin_12;
 		SPI_GPIO= GPIOB;
-		NSS_GPIO = GPIOB;
+		mNSS_GPIO = GPIOB;
 	}
 	else if(mSPI==SPI3)
 	{
@@ -104,9 +100,9 @@ void SPI::Init(SPI_TypeDef* spi,GPIO_TypeDef* irqGpio,uint16_t irqPin,bool remap
 			MOSI_Pin = GPIO_Pin_12;
 			MISO_Pin = GPIO_Pin_11;
 			SCK_Pin  = GPIO_Pin_10;
-			NSS_Pin  = GPIO_Pin_4;
+			mNSS_Pin  = GPIO_Pin_4;
 			SPI_GPIO= GPIOC;
-			NSS_GPIO = GPIOA;
+			mNSS_GPIO = GPIOA;
 		}
 		else
 		{
@@ -114,9 +110,9 @@ void SPI::Init(SPI_TypeDef* spi,GPIO_TypeDef* irqGpio,uint16_t irqPin,bool remap
 			MOSI_Pin = GPIO_Pin_5;
 			MISO_Pin = GPIO_Pin_4;
 			SCK_Pin  = GPIO_Pin_3;
-			NSS_Pin  = GPIO_Pin_15;
+			mNSS_Pin  = GPIO_Pin_15;
 			SPI_GPIO= GPIOB;
-			NSS_GPIO = GPIOA;
+			mNSS_GPIO = GPIOA;
 		}
 	}
 	else
@@ -128,9 +124,9 @@ void SPI::Init(SPI_TypeDef* spi,GPIO_TypeDef* irqGpio,uint16_t irqPin,bool remap
 			MOSI_Pin = GPIO_Pin_5;
 			MISO_Pin = GPIO_Pin_4;
 			SCK_Pin  = GPIO_Pin_3;
-			NSS_Pin  = GPIO_Pin_15;
+			mNSS_Pin  = GPIO_Pin_15;
 			SPI_GPIO= GPIOB;
-			NSS_GPIO = GPIOA;
+			mNSS_GPIO = GPIOA;
 		}
 		else
 		{
@@ -139,18 +135,18 @@ void SPI::Init(SPI_TypeDef* spi,GPIO_TypeDef* irqGpio,uint16_t irqPin,bool remap
 			MOSI_Pin = GPIO_Pin_7;
 			MISO_Pin = GPIO_Pin_6;
 			SCK_Pin  = GPIO_Pin_5;
-			NSS_Pin  = GPIO_Pin_4;
+			mNSS_Pin  = GPIO_Pin_4;
 			SPI_GPIO= GPIOA;
-			NSS_GPIO = GPIOA;
+			mNSS_GPIO = GPIOA;
 		}
 	}
 	
 	
 	//配置 NSS引脚 
-	GPIO_InitStructure.GPIO_Pin = NSS_Pin;
+	GPIO_InitStructure.GPIO_Pin = mNSS_Pin;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;//PA9时钟速度50MHz
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; //
-	GPIO_Init(NSS_GPIO, &GPIO_InitStructure);
+	GPIO_Init(mNSS_GPIO, &GPIO_InitStructure);
 	
 	//配置SCK MISO MOSI引脚 ，复用输出
 	/*!< Configure SPI_FLASH_SPI pins: SCK MISO MOSI*/
@@ -159,11 +155,6 @@ void SPI::Init(SPI_TypeDef* spi,GPIO_TypeDef* irqGpio,uint16_t irqPin,bool remap
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	GPIO_Init(SPI_GPIO, &GPIO_InitStructure);
 
-	//配置IRQ引脚， 配置为上拉输入
-	GPIO_InitStructure.GPIO_Pin = irqPin;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-	GPIO_Init(irqGpio, &GPIO_InitStructure);
-	
 	
 	SPI_I2S_DeInit(mSPI);                          
 	SPI_Cmd(mSPI, DISABLE); //必须先禁用,才能改变MODE
@@ -188,24 +179,54 @@ void SPI::Init(SPI_TypeDef* spi,GPIO_TypeDef* irqGpio,uint16_t irqPin,bool remap
 ///read a byte from slave or write a byte to slave 
 ///@param dataToSend if write: the data will send to slave
 ///                  if read : the slave register address to read
-///@retval if read(write) succeed
+///@dataReturn allow empty   if write: the same data with send data
+///                          if read : the slave register's data
+///@retval if read or write succeed
 ///////////////////////////////
-bool SPI::ReadOrWriteByte(u8 dataTosend)
+bool SPI::ReadOrWriteByte(u8 dataTosend,u8 *dataReturn)
 {
-	u8 retry=0;  
-	while((mSPI->SR&1<<1)==0)//等待发送区空//while(SPI_I2S_GetFlagStatus(SPI2,SPI_I2S_FLAG_TXE)==RESET)
+	u8 retry=0;
+	EnableSPI();
+	while((mSPI->SR&0x02)==0)//等待发送区空//while(SPI_I2S_GetFlagStatus(SPI2,SPI_I2S_FLAG_TXE)==RESET)
 	{
 		retry++;
-		if(retry>200)return 0;
+		if(retry>200)
+		{
+			DisableSPI();
+			return false;
+		}
 	}  
 	mSPI->DR=dataTosend;  //发送一个byte //SPI_I2S_SendData(SPI2,data);
 	retry=0;
-	while((mSPI->SR&1<<0)==0) //等待接收完一个byte  //while(SPI_I2S_GetFlagStatus(SPI2,SPI_I2S_FLAG_RXNE)==RESET)
+	while((mSPI->SR&0x01)==0) //等待接收完一个byte  //while(SPI_I2S_GetFlagStatus(SPI2,SPI_I2S_FLAG_RXNE)==RESET)
 	{
 		retry++;
-		if(retry>200)return 0;
-	}      
-	return mSPI->DR;          //返回收到的数据 //SPI_I2S_ReceiveData(SPI2);
+		if(retry>200)
+		{
+			DisableSPI();
+			return false;
+		}
+	}
+	if(dataReturn)
+		*dataReturn=mSPI->DR;          //返回收到的数据 //SPI_I2S_ReceiveData(SPI2);
+	DisableSPI();
+	return true;
 }
 
+
+//////////////////////////
+///使能SPI（使能NSS）
+//////////////////////////
+void SPI::EnableSPI(void)
+{
+	mNSS_GPIO->BRR = mNSS_Pin;
+}
+
+//////////////////////////
+///失能SPI（使能NSS）
+//////////////////////////
+void SPI::DisableSPI(void)
+{
+	mNSS_GPIO->BSRR = mNSS_Pin;
+}
 

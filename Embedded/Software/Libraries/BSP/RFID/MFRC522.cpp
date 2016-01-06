@@ -17,11 +17,18 @@
 
 
 MFRC522::MFRC522(USART *usart,GPIO *reset,GPIO *pctrl)
-:mUsart(*usart),mResetPin(*reset),mPctrlPin(*pctrl)
+:mResetPin(*reset),mPctrlPin(*pctrl),mUseSPI(false),mUsart(usart)
 {
 	
 	
 }
+MFRC522::MFRC522(SPI *spi,GPIO *reset,GPIO *pctrl)
+:mResetPin(*reset),mPctrlPin(*pctrl),mUseSPI(true),mSPI(spi)
+{
+	
+	
+}
+
 void MFRC522::PCDReset()
 {
 	if(&mPctrlPin!=0x000000)//使用了硬件电源控制
@@ -61,37 +68,70 @@ bool MFRC522::WriteRawRC(unsigned char address, unsigned char value)
 {
 	double timeOut=TaskManager::Time();
 	u8 reteunval;
-	mUsart.ClearReceiveBuffer();
+#ifdef MFRC522_USE_USART
+	if(!mUseSPI)
+		mUsart->ClearReceiveBuffer();
+#endif
 	//最高位为0，表示写数据
 	/*	address = ((address<<1)&0x7E);*///！！！！这里不使用这个，部分文档说明不一，请根据所使用硬件更改
 	address = address&0x7F;
-	mUsart.SendData(&address,1);
-	while(mUsart.ReceiveBufferSize()<=0)
+#ifdef MFRC522_USE_USART
+	if(!mUseSPI)
 	{
-		if(TaskManager::Time()-timeOut>0.010)//大于10ms判定是超时，时间可改
+		mUsart->SendData(&address,1);
+		while(mUsart->ReceiveBufferSize()<=0)
+		{
+			if(TaskManager::Time()-timeOut>0.010)//大于10ms判定是超时，时间可改
+				return false;
+		}
+		mUsart->GetReceivedData(&reteunval,1);
+		if(reteunval!=address)//返回的地址与发的不相同，错误
+			return false;
+		mUsart->SendData(&value,1);
+	}
+#endif
+#ifdef MFRC522_USE_SPI
+	if(mUseSPI)
+	{
+		if(!mSPI->ReadOrWriteByte(address))
+			return false;
+		if(!mSPI->ReadOrWriteByte(value))
 			return false;
 	}
-	mUsart.GetReceivedData(&reteunval,1);
-	if(reteunval!=address)//返回的地址与发的不相同，错误
-		return false;
-	mUsart.SendData(&value,1);
+#endif
 	return true;
 }
 
 unsigned char MFRC522::ReadRawRC(unsigned char address)
 {
 	double timeOut=TaskManager::Time();
-	mUsart.ClearReceiveBuffer();
+	unsigned char temp;
+#ifdef MFRC522_USE_USART
+	if(!mUseSPI)
+		mUsart->ClearReceiveBuffer();
+#endif
 //	address = ((address<<1)&0x7E)|0x80;
 	address = (address&0x7F)|0x80;
-	mUsart.SendData(&address,1);
-	while(mUsart.ReceiveBufferSize()<=0)
+#ifdef MFRC522_USE_USART
+	if(!mUseSPI)
 	{
-		if(TaskManager::Time()-timeOut>0.010)//大于10ms判定是超时，时间可改
-			break;
+		mUsart->SendData(&address,1);
+		while(mUsart->ReceiveBufferSize()<=0)
+		{
+			if(TaskManager::Time()-timeOut>0.010)//大于10ms判定是超时，时间可改
+				break;
+		}
+		
+		mUsart->GetReceivedData(&temp,1);
 	}
-	unsigned char temp;
-	mUsart.GetReceivedData(&temp,1);
+#endif
+#ifdef MFRC522_USE_SPI
+	if(mUseSPI)
+	{
+		if(!mSPI->ReadOrWriteByte(address,&temp))
+			return false;
+	}
+#endif
 	return temp;
 }
 

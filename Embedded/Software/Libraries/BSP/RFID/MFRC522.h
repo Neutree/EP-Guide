@@ -51,10 +51,15 @@
 class MFRC522
 {
 private:
-	USART &mUsart;
 	GPIO &mResetPin;
 	GPIO &mPctrlPin;
-	
+	bool mUseSPI;
+#ifdef MFRC522_USE_USART
+	USART *mUsart;
+#endif
+#ifdef MFRC522_USE_SPI
+	SPI *mSPI;
+#endif
 	//////////////////
 	///写RC632寄存器
 	///@param address 要写的MFRC522寄存器地址
@@ -91,14 +96,25 @@ private:
 	////////////////////////
 	void CalulateCRC16(unsigned char *pIndata,unsigned char len,unsigned char *pOutData);
 public:
+
+#ifdef MFRC522_USE_USART
 	/////////////////////
-	///构造函数
+	///构造函数（使用USART连接）
 	///@param usart 与MFRC522连接的串口对象的地址
 	///@param reset 与MFRC522连接的复位接口对象的地址，默认没有，既可以悬空
 	///@param reset 与MFRC522连接的电源控制接口对象的地址，默认没有，既可以悬空
 	/////////////////////
 	MFRC522(USART *usart,GPIO *reset=0,GPIO *pctrl=0);
-	
+#endif
+#ifdef MFRC522_USE_SPI
+	/////////////////////
+	///构造函数(使用SPI连接)
+	///@param spi 与MFRC522连接的SPI对象的地址
+	///@param reset 与MFRC522连接的复位接口对象的地址，默认没有，既可以悬空
+	///@param reset 与MFRC522连接的电源控制接口对象的地址，默认没有，既可以悬空
+	/////////////////////
+	MFRC522(SPI *spi,GPIO *reset=0,GPIO *pctrl=0);
+#endif
 
 	//////////////////////
 	///PCD复位，包括复位模块以及模块内的设备（天线）

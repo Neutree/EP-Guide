@@ -42,13 +42,11 @@ public:
 	///////////////////////////
 	///Constructor for SPI 
 	///@param SPI choose which SPI to use SPI1 or SPI2
-	///@param irqGpio interrupt GPIO when recieved data
-	///@param irqPin  interrupt Pin when recieved data 
 	///@param if remap pin
 	///@param speed speed of SPI default:SPI_SPEED_256(281.25kHz) @see SPI_Speed 
 	///@param firstBit the first bit of transfer LSB or MSB @see SPI_FirstBit  default:SPI_FirstBit_MSB_
 	//////////////////////////
-	SPI(SPI_TypeDef* spi,GPIO_TypeDef* irqGpio,uint16_t irqPin,bool remap=false,SPI_Speed speed=SPI_SPEED_256,SPI_FirstBit firstBit=SPI_FirstBit_MSB_);
+	SPI(SPI_TypeDef* spi,bool remap=false,SPI_Speed speed=SPI_SPEED_256,SPI_FirstBit firstBit=SPI_FirstBit_MSB_);
 
 	/////////////////////////////////////
 	///@param speed the speed of SPI @see SPI_Speed
@@ -65,28 +63,38 @@ public:
 	///read a byte from slave or write a byte to slave 
 	///@param dataToSend if write: the data will send to slave
 	///                  if read : the slave register address to read
-	///@retval if read(write) succeed
+	///@dataReturn allow empty   if write: the same data with send data
+	///                          if read : the slave register's data
+	///@retval if read or write succeed
 	///////////////////////////////
-	bool ReadOrWriteByte(u8 dataTosend);
+	bool ReadOrWriteByte(u8 dataTosend,u8 *dataReturn=0);
 
 private:
 	
 	//
 	SPI_TypeDef* mSPI;
-	
+	GPIO_TypeDef* mNSS_GPIO;
+	uint16_t      mNSS_Pin;
 
 
 	///////////////////////////
 	///Constructor for SPI 
 	///@param SPI choose which SPI to use SPI1(default) or SPI2
-	///@param irqGpio interrupt GPIO when recieved data
-	///@param irqPin  interrupt Pin when recieved data 
 	///@param if remap pin
 	///@param speed speed of SPI @see SPI_Speed default:SPI_SPEED_16
 	///@param firstBit the first bit of transfer LSB or MSB @see SPI_FirstBit  default:SPI_FirstBit_MSB_
 	//////////////////////////
-	void Init(SPI_TypeDef* spi,GPIO_TypeDef* irqGpio,uint16_t irqPin,bool remap=false,SPI_Speed speed=SPI_SPEED_16,SPI_FirstBit firstBit=SPI_FirstBit_MSB_);
+	void Init(SPI_TypeDef* spi,bool remap=false,SPI_Speed speed=SPI_SPEED_16,SPI_FirstBit firstBit=SPI_FirstBit_MSB_);
 	
+	//////////////////////////
+	///使能SPI（使能NSS）
+	//////////////////////////
+	void EnableSPI(void);
+
+	//////////////////////////
+	///失能SPI（使能NSS）
+	//////////////////////////
+	void DisableSPI(void);
 };
 
 
