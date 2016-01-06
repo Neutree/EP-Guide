@@ -25,4 +25,10 @@ public class ConstantCode {
 	public static final int Res_Fail_OrderParkSpace=2005; //预约车位响应
 	public static final int Res_Fail_HistoryParkQuery=2006; //停车记录查询响应
 	
+	//-- 其他 --//
+	public static final int Res_Resgitered=7002; //已经注册
+	public static final int Res_NotResgiter=6002; //未注册
+	public static final int Res_Abnormal_TokenLogin=7003; //token登录账号异常，已有人在其他地方用帐密登录过
+	public static final int Res_Illegal_User=3001; //非法用户访问
+	public static final int Res_NotGrageID=6004; //没有此车库ID
 }

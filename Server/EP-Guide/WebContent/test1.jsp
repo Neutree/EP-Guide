@@ -4,8 +4,8 @@
 </head>
 <body>
 	<form action="" id="form" method="post">
-		Url:<input type="text" id="url" /><br />
-		Data:<input type="text" name="data"><br />
+		Url:<input  type="text" id="url" /><br />
+		Data:<input  type="text" name="data"><br />
 		<button onclick="post()">确定</button>
 	</form>
 </body>

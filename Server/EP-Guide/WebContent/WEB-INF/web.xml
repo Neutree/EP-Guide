@@ -29,39 +29,48 @@
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>HandleChangePwd</servlet-name>
-    <servlet-class>user.ChangePwd</servlet-class>
+    <servlet-name>HandleTokenLogin</servlet-name>
+    <servlet-class>control.TokenLogin</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>HandleChangePwd</servlet-name>
-    <url-pattern>/changePwd</url-pattern>
+    <servlet-name>HandleTokenLogin</servlet-name>
+    <url-pattern>/tokenLogin</url-pattern>
   </servlet-mapping>
   
   <servlet>
-    <servlet-name>HandleInquireUserInf</servlet-name>
-    <servlet-class>user.InquireUserInf</servlet-class>
+    <servlet-name>HandleOrderParkSqpce</servlet-name>
+    <servlet-class>control.OrderParkSqpce</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>HandleInquireUserInf</servlet-name>
-    <url-pattern>/inquireUserInf</url-pattern>
+    <servlet-name>HandleOrderParkSqpce</servlet-name>
+    <url-pattern>/orderParkSqpce</url-pattern>
   </servlet-mapping>
   
   <servlet>
-    <servlet-name>HandleGetWeekPlan</servlet-name>
-    <servlet-class>user.GetWeekPlan</servlet-class>
+    <servlet-name>HandleQueryParkSpaces</servlet-name>
+    <servlet-class>control.QueryParkSpaces</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>HandleGetWeekPlan</servlet-name>
-    <url-pattern>/getWeekPlan</url-pattern>
+    <servlet-name>HandleQueryParkSpaces</servlet-name>
+    <url-pattern>/queryParkSpaces</url-pattern>
   </servlet-mapping>
   
   <servlet>
-    <servlet-name>HandleGetClass</servlet-name>
-    <servlet-class>user.GetClass</servlet-class>
+    <servlet-name>HandleQueryParkHistory</servlet-name>
+    <servlet-class>control.QueryParkHistory</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>HandleGetClass</servlet-name>
-    <url-pattern>/getClass</url-pattern>
+    <servlet-name>HandleQueryParkHistory</servlet-name>
+    <url-pattern>/queryParkHistory</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>HandleHeartBeat</servlet-name>
+    <servlet-class>control.HeartBeat</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HandleHeartBeat</servlet-name>
+    <url-pattern>/heartBeat</url-pattern>
   </servlet-mapping>
   
 </web-app>

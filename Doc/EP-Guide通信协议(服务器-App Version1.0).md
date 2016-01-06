@@ -20,6 +20,7 @@ _ _ _
   提交参数：username,password
 - 返回格式：{"result":"xxx","token":"xxx"};
   返回命令字：2001-登录失败
+  			6002-账号未注册
 　　　　　　  8001-登录成功
   返回参数：result,token
 - 使用方法：解析JSON对象，先获取result，如果为2001，则data里数据为空
@@ -35,6 +36,7 @@ _ _ _
   提交参数：username,password,car_ID(车牌号)
 - 返回格式：{"result":xxx, "data":"{…}"};
   返回命令字：2002-失败
+  		  7002-已注册
 　　　　　　8002-成功
   返回参数：token
 - 使用方法：解析JSON对象，先获取result，如果为2002，则代表注册失败，data里数据为空
@@ -44,12 +46,13 @@ _ _ _
 
 - 功能：App通过本地缓存的token和username向服务器进行登录验证
 - 描述：服务器将客户端发来的token与进行验证，如果不通过则强制用户重新登录
-- 请求地址(url):ep-guide/api/xxx.java
-- 提交格式：{"action":xxx, "data":"{...}"};
-  提交命令字：1002-请求二次登录
+- 请求地址(url):http://www.doubleeggs.com:8080/EP-Guide/tokenLogin
+- 提交格式：{"action":"1003", "username":"dandan","token":"ad1c0358ae459416e567c3405eb7b963"}
+  提交命令字：1003-请求二次登录
   提交参数：username,token
 - 返回格式：{"result":xxx, "data":"{…}"};
   返回命令字：2003-失败
+  		  6002-账号未注册
 　　　　　　7003-账号异常
 　　　　　　8003-成功
   返回参数：null
@@ -63,9 +66,11 @@ _ _ _
 - 请求地址(url):ep-guide/api/xxx.java
 - 提交格式：{"action":xxx, "data":"{...}"};
   提交命令字：1004-请求车库里所有车位信息
-  提交参数：garageID
+  提交参数：garageID,token
 - 返回格式：{"result":xxx, "data":"{…}"};
   返回命令字：2004-失败
+  		  3001-非法用户访问,token不正确
+          6004-没有此车库ID
 　　　　　　8004-成功
   返回参数：parking_spaces (List<HashMap>)
 - 使用方法：解析JSON对象，先获取result，如果为2004，则代表操作失败，data里数据为空，如果为8004，则返回一个带有hashMap格式的队列,键值对格式为(pSpace_ID,pSpace_status),ID从1开始取值

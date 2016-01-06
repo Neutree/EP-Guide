@@ -29,6 +29,7 @@ public class Login extends HttpServlet{
 		JSONObject backnews=new JSONObject();
 		
 		//-- 处理接受到的json数据，并验证 --//
+		request.setCharacterEncoding("UTF-8");
 		receiveData=request.getParameter("data");//接受客户端的数据，即用户名和密码
 			// 1. 验空判断
 		if (receiveData==null) {
@@ -64,7 +65,13 @@ public class Login extends HttpServlet{
 			// 2.2  判断账号密码是否正确
 			token = DBOpreate.queryLogin(username, password);
 			if (token!=null && !token.isEmpty()) {
-				result=ConstantCode.Req_Login;
+				if (token.equals("6002")) {
+					result=ConstantCode.Res_NotResgiter;
+					token=null;
+				}
+				else {
+					result=ConstantCode.Res_Login;
+				}
 			}
 			System.out.println("Info ,　token MD5加密后为："+token);
 		} catch (Exception e1) {
@@ -80,6 +87,7 @@ public class Login extends HttpServlet{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		response.setCharacterEncoding("UTF-8");
 		response.getWriter().write(backnews.toString());
 	}
 	

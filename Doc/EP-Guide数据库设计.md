@@ -10,6 +10,7 @@
 - garage_ID (主键)
 - garage_name (车库名)
 - isFull (是否已满)
+- gtwMac （网关mac地址）
 
 #####车位表(parking_spaces)
 - ID (主键) (int)
