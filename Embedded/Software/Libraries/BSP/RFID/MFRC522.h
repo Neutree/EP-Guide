@@ -17,9 +17,36 @@
 # define __MFRC522_H_
 
 
+
+
+
+
+/********************************************Configuration***********************************************************/
+
+////////////////////////define what ways to communicate with MFRC522 module, One of them or both of them
+						#define MFRC522_USE_USART       //uncomment ir if use USART ot communicate with MFRC522 
+						#define MFRC522_USE_SPI         //uncomment it if use SPI to communicate with MFRC522
+
+//////////////////////// buffer size
+						#define MFRC522_MaxReceiveLen 18   //用来当缓冲区和临时变量使用的
+
+/*********************************************************************************************************************/
+
+/////////////////////////////////////
+///include files and module
+////////////////////////////////////
 # include "GPIO.h"
-# include "USART.h"
 # include "TaskManager.h"
+
+#ifdef MFRC522_USE_USART
+	# include "USART.h"
+#endif
+
+#ifdef MFRC522_USE_SPI
+	# include "SPI.h"
+#endif
+
+
 
 class MFRC522
 {
@@ -171,10 +198,7 @@ public:
 	
 };
 
-/////////////////////////////////////////
-///
-#define MFRC522_MaxReceiveLen 18   //用来当缓冲区和临时变量使用的
-/////////////////////////////////////////
+
 
 
 /////////////////////////////////////////////////////////////////////

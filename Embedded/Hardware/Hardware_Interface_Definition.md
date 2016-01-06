@@ -13,8 +13,8 @@
 |---------|---------|
 |NSS(CSN) |   PA4   |
 |SCK      |   PA5   |
-|MISO（外设MOSI）|PA6|
-|MOSI（外设MISO）|PA7|
+|MISO（接收端）（外设MOSI）|PA6|
+|MOSI（发送端）（外设MISO）|PA7|
 
 # WIFI
 * USART1
