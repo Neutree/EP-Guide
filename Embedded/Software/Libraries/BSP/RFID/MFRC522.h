@@ -60,18 +60,6 @@ private:
 #ifdef MFRC522_USE_SPI
 	SPI *mSPI;
 #endif
-	//////////////////
-	///写RC632寄存器
-	///@param address 要写的MFRC522寄存器地址
-	///@param value 写往寄存器的值
-	//////////////////
-	
-
-	//////////////////
-	///读RC632中某个寄存器的值
-	///@param address 要写的MFRC522寄存器地址
-	///@retval 返回的寄存器中的值
-	//////////////////
 
 
 	///////////////////////
@@ -94,9 +82,27 @@ private:
 	///CRC16校验计算
 	////////////////////////
 	void CalulateCRC16(unsigned char *pIndata,unsigned char len,unsigned char *pOutData);
+	
+	
+	
 public:
+		
+	//////////////////
+	///写RC632寄存器
+	///@param address 要写的MFRC522寄存器地址
+	///@param value 写往寄存器的值
+	//////////////////
 	bool WriteRawRC(unsigned char address, unsigned char value);
+	
+
+	//////////////////
+	///读RC632中某个寄存器的值
+	///@param address 要写的MFRC522寄存器地址
+	///@retval 返回的寄存器中的值
+	//////////////////
 	unsigned char ReadRawRC(unsigned char address);
+	
+	
 
 #ifdef MFRC522_USE_USART
 	/////////////////////
