@@ -188,7 +188,8 @@ void SPI::Init(SPI_TypeDef* spi,bool remap,SPI_Speed speed,SPI_FirstBit firstBit
 bool SPI::ReadOrWriteByte(u8 dataTosend,u8 *dataReturn)
 {
 	u8 retry=0;
-	EnableSPI();
+	u8 temp;
+//	EnableSPI();
 	while((mSPI->SR&0x02)==0)//等待发送区空//while(SPI_I2S_GetFlagStatus(SPI2,SPI_I2S_FLAG_TXE)==RESET)
 	{
 		retry++;
@@ -199,6 +200,15 @@ bool SPI::ReadOrWriteByte(u8 dataTosend,u8 *dataReturn)
 		}
 	}  
 	mSPI->DR=dataTosend;  //发送一个byte //SPI_I2S_SendData(SPI2,data);
+	while((mSPI->SR&0x02)==0)//等待发送区空//while(SPI_I2S_GetFlagStatus(SPI2,SPI_I2S_FLAG_TXE)==RESET)
+	{
+		retry++;
+		if(retry>200)
+		{
+			DisableSPI();
+			return false;
+		}
+	}  
 	retry=0;
 	while((mSPI->SR&0x01)==0) //等待接收完一个byte  //while(SPI_I2S_GetFlagStatus(SPI2,SPI_I2S_FLAG_RXNE)==RESET)
 	{
@@ -209,12 +219,12 @@ bool SPI::ReadOrWriteByte(u8 dataTosend,u8 *dataReturn)
 			return false;
 		}
 	}
+	temp=mSPI->DR;
 	if(dataReturn)
-		*dataReturn=mSPI->DR;          //返回收到的数据 //SPI_I2S_ReceiveData(SPI2);
-	DisableSPI();
+		*dataReturn=temp;          //返回收到的数据 //SPI_I2S_ReceiveData(SPI2);
+//	DisableSPI();
 	return true;
 }
-
 
 //////////////////////////
 ///使能SPI（使能NSS）

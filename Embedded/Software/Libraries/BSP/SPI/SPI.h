@@ -68,6 +68,8 @@ public:
 	///@retval if read or write succeed
 	///////////////////////////////
 	bool ReadOrWriteByte(u8 dataTosend,u8 *dataReturn=0);
+	
+	
 
 	//////////////////////////
 	///使能SPI（使能NSS）

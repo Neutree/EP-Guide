@@ -67,15 +67,11 @@ void MFRC522::PCDReset()
 bool MFRC522::WriteRawRC(unsigned char address, unsigned char value)
 {
 	double timeOut=TaskManager::Time();
-	u8 reteunval;
-#ifdef MFRC522_USE_USART
-	if(!mUseSPI)
-		mUsart->ClearReceiveBuffer();
-#endif
-	
+	u8 reteunval;	
 #ifdef MFRC522_USE_USART
 	if(!mUseSPI)
 	{
+		mUsart->ClearReceiveBuffer();
 		address = address&0x7F;//使用USART时使用
 		mUsart->SendData(&address,1);
 		while(mUsart->ReceiveBufferSize()<=0)
@@ -92,12 +88,14 @@ bool MFRC522::WriteRawRC(unsigned char address, unsigned char value)
 #ifdef MFRC522_USE_SPI
 	if(mUseSPI)
 	{
+		mSPI->EnableSPI();
 		//最高位为0，表示写数据
 		address = ((address<<1)&0x7E);//使用SPI使用
 		if(!mSPI->ReadOrWriteByte(address))
 			return false;
 		if(!mSPI->ReadOrWriteByte(value))
 			return false;
+		mSPI->DisableSPI();
 	}
 #endif
 	return true;
@@ -107,15 +105,11 @@ unsigned char MFRC522::ReadRawRC(unsigned char address)
 {
 	double timeOut=TaskManager::Time();
 	unsigned char temp;
-#ifdef MFRC522_USE_USART
-	if(!mUseSPI)
-		mUsart->ClearReceiveBuffer();
-#endif
-
 	
 #ifdef MFRC522_USE_USART
 	if(!mUseSPI)
 	{
+		mUsart->ClearReceiveBuffer();
 		address = (address&0x7F)|0x80;
 		mUsart->SendData(&address,1);
 		while(mUsart->ReceiveBufferSize()<=0)
@@ -130,13 +124,13 @@ unsigned char MFRC522::ReadRawRC(unsigned char address)
 #ifdef MFRC522_USE_SPI
 	if(mUseSPI)
 	{
-		//mSPI->EnableSPI();
+		mSPI->EnableSPI();
 		address = ((address<<1)&0x7E)|0x80;
 		if(!mSPI->ReadOrWriteByte(address,&temp))
 			return false;
-		if(!mSPI->ReadOrWriteByte(address,&temp))
+		if(!mSPI->ReadOrWriteByte(0,&temp))
 			return false;
-		//mSPI->DisableSPI();
+		mSPI->DisableSPI();
 	}
 #endif
 	return temp;
