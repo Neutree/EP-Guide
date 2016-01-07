@@ -28,7 +28,9 @@ public class ConstantCode {
 	//-- 其他 --//
 	public static final int Res_Resgitered=7002; //已经注册
 	public static final int Res_NotResgiter=6002; //未注册
+	public static final int Res_Wrong_Pwd=4002; //未注册
 	public static final int Res_Abnormal_TokenLogin=7003; //token登录账号异常，已有人在其他地方用帐密登录过
 	public static final int Res_Illegal_User=3001; //非法用户访问
+	public static final int legal_User=3000; //非法用户访问
 	public static final int Res_NotGrageID=6004; //没有此车库ID
 }

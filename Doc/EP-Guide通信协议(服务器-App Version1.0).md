@@ -20,6 +20,7 @@ _ _ _
   提交参数：username,password
 - 返回格式：{"result":"xxx","token":"xxx"};
   返回命令字：2001-登录失败
+  			4002-密码错误
   			6002-账号未注册
 　　　　　　  8001-登录成功
   返回参数：result,token
@@ -63,13 +64,13 @@ _ _ _
 
 - 功能：App向服务器请求各个车位的信息
 - 描述：
-- 请求地址(url):ep-guide/api/xxx.java
-- 提交格式：{"action":xxx, "data":"{...}"};
+- 请求地址(url):http://localhost:8080/EP-Guide/queryParkSpaces
+- 提交格式：{"action":"1004", "token":"078701c50c5f0fd4395ecd284c645439","garage_ID":"1"}
   提交命令字：1004-请求车库里所有车位信息
-  提交参数：garageID,token
+  提交参数：garage_ID,token
 - 返回格式：{"result":xxx, "data":"{…}"};
   返回命令字：2004-失败
-  		  3001-非法用户访问,token不正确
+  		  3001-非法用户访问,token不正确，需重新登陆
           6004-没有此车库ID
 　　　　　　8004-成功
   返回参数：parking_spaces (List<HashMap>)
@@ -83,7 +84,7 @@ _ _ _
 - 请求地址(url):ep-guide/api/xxx.java
 - 提交格式：{"action":xxx, "data":"{...}"};
   提交命令字：1005-请求更改某一个车位的状态信息（空闲->占用）
-  提交参数：garageID,pSpace_ID,car_ID
+  提交参数：garage_ID,pSpace_ID,car_ID
 - 返回格式：{"result":xxx, "data":"{…}"};
   返回命令字：2005-失败
 　　　　　　8005-成功

@@ -13,7 +13,7 @@ public class DBHelper {
 	public Statement sql;
 	public PreparedStatement preState;
 	//public ResultSet rs;
-	public DBHelper(String sqlexcu){
+	public DBHelper(){
 		try{
 			Class.forName("com.mysql.jdbc.Driver");
 		}
@@ -27,7 +27,7 @@ public class DBHelper {
 		try {
 			con=DriverManager.getConnection(uri,dblogName,dbpassword);
 			sql=con.createStatement();
-			preState = con.prepareStatement(sqlexcu);	
+				
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
