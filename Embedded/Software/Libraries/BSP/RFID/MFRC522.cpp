@@ -72,12 +72,11 @@ bool MFRC522::WriteRawRC(unsigned char address, unsigned char value)
 	if(!mUseSPI)
 		mUsart->ClearReceiveBuffer();
 #endif
-	//最高位为0，表示写数据
-	/*	address = ((address<<1)&0x7E);*///！！！！这里不使用这个，部分文档说明不一，请根据所使用硬件更改
-	address = address&0x7F;
+	
 #ifdef MFRC522_USE_USART
 	if(!mUseSPI)
 	{
+		address = address&0x7F;//使用USART时使用
 		mUsart->SendData(&address,1);
 		while(mUsart->ReceiveBufferSize()<=0)
 		{
@@ -93,6 +92,8 @@ bool MFRC522::WriteRawRC(unsigned char address, unsigned char value)
 #ifdef MFRC522_USE_SPI
 	if(mUseSPI)
 	{
+		//最高位为0，表示写数据
+		address = ((address<<1)&0x7E);//使用SPI使用
 		if(!mSPI->ReadOrWriteByte(address))
 			return false;
 		if(!mSPI->ReadOrWriteByte(value))
@@ -110,11 +111,12 @@ unsigned char MFRC522::ReadRawRC(unsigned char address)
 	if(!mUseSPI)
 		mUsart->ClearReceiveBuffer();
 #endif
-//	address = ((address<<1)&0x7E)|0x80;
-	address = (address&0x7F)|0x80;
+
+	
 #ifdef MFRC522_USE_USART
 	if(!mUseSPI)
 	{
+		address = (address&0x7F)|0x80;
 		mUsart->SendData(&address,1);
 		while(mUsart->ReceiveBufferSize()<=0)
 		{
@@ -128,8 +130,13 @@ unsigned char MFRC522::ReadRawRC(unsigned char address)
 #ifdef MFRC522_USE_SPI
 	if(mUseSPI)
 	{
+		//mSPI->EnableSPI();
+		address = ((address<<1)&0x7E)|0x80;
 		if(!mSPI->ReadOrWriteByte(address,&temp))
 			return false;
+		if(!mSPI->ReadOrWriteByte(address,&temp))
+			return false;
+		//mSPI->DisableSPI();
 	}
 #endif
 	return temp;

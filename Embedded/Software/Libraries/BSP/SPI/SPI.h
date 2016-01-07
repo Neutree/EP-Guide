@@ -69,6 +69,16 @@ public:
 	///////////////////////////////
 	bool ReadOrWriteByte(u8 dataTosend,u8 *dataReturn=0);
 
+	//////////////////////////
+	///使能SPI（使能NSS）
+	//////////////////////////
+	void EnableSPI(void);
+
+	//////////////////////////
+	///失能SPI（使能NSS）
+	//////////////////////////
+	void DisableSPI(void);
+	
 private:
 	
 	//
@@ -86,15 +96,7 @@ private:
 	//////////////////////////
 	void Init(SPI_TypeDef* spi,bool remap=false,SPI_Speed speed=SPI_SPEED_16,SPI_FirstBit firstBit=SPI_FirstBit_MSB_);
 	
-	//////////////////////////
-	///使能SPI（使能NSS）
-	//////////////////////////
-	void EnableSPI(void);
 
-	//////////////////////////
-	///失能SPI（使能NSS）
-	//////////////////////////
-	void DisableSPI(void);
 };
 
 

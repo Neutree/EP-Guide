@@ -72,7 +72,6 @@ private:
 	///@param address 要写的MFRC522寄存器地址
 	///@retval 返回的寄存器中的值
 	//////////////////
-	unsigned char ReadRawRC(unsigned char address);
 
 
 	///////////////////////
@@ -96,6 +95,7 @@ private:
 	////////////////////////
 	void CalulateCRC16(unsigned char *pIndata,unsigned char len,unsigned char *pOutData);
 public:
+	unsigned char ReadRawRC(unsigned char address);
 
 #ifdef MFRC522_USE_USART
 	/////////////////////

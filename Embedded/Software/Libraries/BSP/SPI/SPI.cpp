@@ -77,7 +77,7 @@ void SPI::Init(SPI_TypeDef* spi,bool remap,SPI_Speed speed,SPI_FirstBit firstBit
 	SPI_InitTypeDef  SPI_InitStructure;
 	GPIO_InitTypeDef GPIO_InitStructure;
 	uint16_t MOSI_Pin,MISO_Pin,SCK_Pin;
-	GPIO_TypeDef* SPI_GPIO;
+	GPIO_TypeDef* SPI_Other_GPIO;
 	//开启SPI所用引脚的时钟
 	if(mSPI==SPI2)
 	{
@@ -88,7 +88,7 @@ void SPI::Init(SPI_TypeDef* spi,bool remap,SPI_Speed speed,SPI_FirstBit firstBit
 		MISO_Pin = GPIO_Pin_14;
 		SCK_Pin  = GPIO_Pin_13;
 		mNSS_Pin  = GPIO_Pin_12;
-		SPI_GPIO= GPIOB;
+		SPI_Other_GPIO= GPIOB;
 		mNSS_GPIO = GPIOB;
 	}
 	else if(mSPI==SPI3)
@@ -101,7 +101,7 @@ void SPI::Init(SPI_TypeDef* spi,bool remap,SPI_Speed speed,SPI_FirstBit firstBit
 			MISO_Pin = GPIO_Pin_11;
 			SCK_Pin  = GPIO_Pin_10;
 			mNSS_Pin  = GPIO_Pin_4;
-			SPI_GPIO= GPIOC;
+			SPI_Other_GPIO= GPIOC;
 			mNSS_GPIO = GPIOA;
 		}
 		else
@@ -111,7 +111,7 @@ void SPI::Init(SPI_TypeDef* spi,bool remap,SPI_Speed speed,SPI_FirstBit firstBit
 			MISO_Pin = GPIO_Pin_4;
 			SCK_Pin  = GPIO_Pin_3;
 			mNSS_Pin  = GPIO_Pin_15;
-			SPI_GPIO= GPIOB;
+			SPI_Other_GPIO= GPIOB;
 			mNSS_GPIO = GPIOA;
 		}
 	}
@@ -125,7 +125,7 @@ void SPI::Init(SPI_TypeDef* spi,bool remap,SPI_Speed speed,SPI_FirstBit firstBit
 			MISO_Pin = GPIO_Pin_4;
 			SCK_Pin  = GPIO_Pin_3;
 			mNSS_Pin  = GPIO_Pin_15;
-			SPI_GPIO= GPIOB;
+			SPI_Other_GPIO= GPIOB;
 			mNSS_GPIO = GPIOA;
 		}
 		else
@@ -136,7 +136,7 @@ void SPI::Init(SPI_TypeDef* spi,bool remap,SPI_Speed speed,SPI_FirstBit firstBit
 			MISO_Pin = GPIO_Pin_6;
 			SCK_Pin  = GPIO_Pin_5;
 			mNSS_Pin  = GPIO_Pin_4;
-			SPI_GPIO= GPIOA;
+			SPI_Other_GPIO= GPIOA;
 			mNSS_GPIO = GPIOA;
 		}
 	}
@@ -153,7 +153,7 @@ void SPI::Init(SPI_TypeDef* spi,bool remap,SPI_Speed speed,SPI_FirstBit firstBit
 	GPIO_InitStructure.GPIO_Pin = MISO_Pin|MOSI_Pin|SCK_Pin;
 //	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-	GPIO_Init(SPI_GPIO, &GPIO_InitStructure);
+	GPIO_Init(SPI_Other_GPIO, &GPIO_InitStructure);
 
 	
 	SPI_I2S_DeInit(mSPI);                          
@@ -161,10 +161,10 @@ void SPI::Init(SPI_TypeDef* spi,bool remap,SPI_Speed speed,SPI_FirstBit firstBit
 	SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;  //两线全双工
 	SPI_InitStructure.SPI_Mode = SPI_Mode_Master;       //主
 	SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;      //8位
-	SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;        //CPOL=0 时钟悬空低
-	SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;       //CPHA=0 数据捕获第1个
+	SPI_InitStructure.SPI_CPOL = SPI_CPOL_High;        //CPOL=1 时钟悬空高
+	SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;       //CPHA=1 数据捕获第2个
 	SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;        //软件NSS
-	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8 ; //8分频 9MHz
+	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16 ; //16分频 4.5MHz
 	SPI_InitStructure.SPI_FirstBit = firstBit;      //高(低)位在前
 	SPI_InitStructure.SPI_CRCPolynomial = 7;        //CRC7
 
@@ -172,7 +172,9 @@ void SPI::Init(SPI_TypeDef* spi,bool remap,SPI_Speed speed,SPI_FirstBit firstBit
 	SPI_Cmd(mSPI, ENABLE);
 	
 	SetSpeed(speed);//设置速度
-	//this->ReadWriteByte(0xff);   //启动传输
+	//this->ReadOrWriteByte(0xff);   //启动传输,注释掉，不使用
+	DisableSPI();
+	
 }
 
 ///////////////////////////////

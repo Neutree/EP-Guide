@@ -7,7 +7,8 @@ GPIO ledGreen(GPIOB,6,GPIO_Mode_Out_PP,GPIO_Speed_50MHz);
 GPIO ledYellow(GPIOB,7,GPIO_Mode_Out_PP,GPIO_Speed_50MHz);
 USART com1(1,115200,true);
 USART com2(2,9600,true);
-SPI spi1(SPI1,false,SPI_SPEED_16);
+
+SPI spi1(SPI2,false,SPI_SPEED_16);
 MFRC522 rfid1(&spi1,&rfidResetPin);
 
 //PICC默认密码(6个字节均为0xff)
@@ -20,15 +21,26 @@ int main()
 	//关两个LED
 	ledYellow.SetLevel(1);
 	ledGreen.SetLevel(1);
-	
 	//PCD复位
-	rfid1.PCDReset();
+//	rfid1.PCDReset();
 	com1<<"start\n\n\n";
+	u8 temp1=(0x37<<1)|0x80,temp2;
 	while(1)
 	{
-	//	TaskManager::DelayMs(500);
-		
-
+		TaskManager::DelayMs(1000);
+//		if(spi1.ReadOrWriteByte(temp1,&temp2))
+//			com1<<"send ok\t"<<temp1<<"\t"<<temp2<<"\n";
+//		else
+//			com1<<"send failed\n";
+//		++temp1;
+//		if(temp1==0x37)
+//			temp1=0x38;
+//		else
+//			temp1=0x37;
+//		temp2=rfid1.ReadRawRC(temp1);
+//		com1<<temp1<<"\t"<<temp2<<"\n";
+//		temp2=11;
+//		com1<<temp2<<"\n";
 		if(rfid1.PcdRequest(MFRC522_PICC_REQIDL,tagInfo))//寻到卡
 		{
 			//com1.SendData(tagInfo,2);//显示卡类型
@@ -77,6 +89,7 @@ int main()
 		{
 			ledGreen.SetLevel(1);
 			ledYellow.SetLevel(1);
+			com1<<"find failed!\n";
 		}
 
 	}
