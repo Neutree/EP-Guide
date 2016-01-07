@@ -38,12 +38,12 @@
   </servlet-mapping>
   
   <servlet>
-    <servlet-name>HandleOrderParkSqpce</servlet-name>
-    <servlet-class>control.OrderParkSqpce</servlet-class>
+    <servlet-name>HandleOrderParkSpace</servlet-name>
+    <servlet-class>control.OrderParkSpace</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>HandleOrderParkSqpce</servlet-name>
-    <url-pattern>/orderParkSqpce</url-pattern>
+    <servlet-name>HandleOrderParkSpace</servlet-name>
+    <url-pattern>/orderParkSpace</url-pattern>
   </servlet-mapping>
   
   <servlet>

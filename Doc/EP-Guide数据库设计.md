@@ -18,6 +18,7 @@
 - park_spaceName (车位名) （String）
 - garage_ID （车库ID） (int)
 - status (车位状态,空闲or占用?) (int)
+- car_ID (所停车的ID) (String)
 - start_time (停车开始时刻) (存时间戳)(long)
 
 #####历史停车记录表(history_park)

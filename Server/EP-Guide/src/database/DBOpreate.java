@@ -80,7 +80,14 @@ public class DBOpreate {
 			db.preState.setString(1, db_token);
 			db.preState.setString(2, db_uname);
 			db.preState.setString(3, db_pwd);
-			db.preState.execute();
+			int orptRow=db.preState.executeUpdate();
+			if (orptRow>0) {
+				System.out.println("Info , 更改token成功 ，token："+db_token);
+			}
+			else {
+				db_token="2001";
+				System.out.println("Info , 更改token失败 ");
+			}
 		} catch (Exception e) {
 			// TODO: handle exception
 			System.out.println("Abnormal , DB : 账号密码登录更新数据库token异常！ ");
@@ -92,7 +99,7 @@ public class DBOpreate {
 			db.con.close();
 		} catch (Exception e) {
 			// TODO: handle exception
-			System.out.println("Abnormal , DB : 账号密码登录时关闭数据库异常： ");
+			System.out.println("Abnormal , DB : 关闭数据库异常： ");
 			e.printStackTrace();
 		}
 
@@ -224,6 +231,53 @@ public class DBOpreate {
 			e.printStackTrace();
 		}
 		return pSpaces;
+	}
+
+	public static boolean orderParkSpace(int garage_ID, String pSpace_ID, String car_ID) {
+		// -- 变量初始化 --//
+		String sqlexcu = null;
+		boolean sucsFlag = false;
+		DBHelper db = new DBHelper();
+
+		// -- 通过获取车库Id获取所有车位信息 --//
+		try {
+			int isOrder=1,status=1;
+			long start_time= System.currentTimeMillis();
+			sqlexcu = "UPDATE parking_spaces SET car_ID=?,status=?,isOrder=?,start_time=? WHERE garage_ID=? And pSpace_ID=?";
+			db.preState = db.con.prepareStatement(sqlexcu);
+			db.preState.setString(1, car_ID);
+			db.preState.setInt(2, status);
+			db.preState.setInt(3, isOrder);
+			db.preState.setLong(4, start_time);
+			db.preState.setInt(5, garage_ID);
+			db.preState.setString(6, pSpace_ID);
+			int orptRow=db.preState.executeUpdate();
+			if (orptRow>0) {
+				sucsFlag=true;
+				System.out.println("Info , 预约车位成功 ，车位ID："+pSpace_ID);
+			}
+			else {
+				sucsFlag=false;
+				System.out.println("Info , 预约车位失败 ，车位ID："+pSpace_ID);
+			}
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("Abnormal , DB : 预约车位时更改车位表异常： ");
+			e.printStackTrace();
+			return false;
+		}
+
+		try {
+			db.sql.close();
+			db.con.close();
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("Abnormal , DB : 预约车位时关闭数据库异常： ");
+			e.printStackTrace();
+			return false;
+		}
+		return sucsFlag;
 	}
 
 	public static int checkToken(String token) {

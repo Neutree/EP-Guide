@@ -70,26 +70,28 @@ _ _ _
   提交参数：garage_ID,token
 - 返回格式：{"result":xxx, "data":"{…}"};
   返回命令字：2004-失败
-  		  3001-非法用户访问,token不正确，需重新登陆
-          6004-没有此车库ID
+  　　　　　　3001-非法用户访问,token不正确，需重新登陆
+  　　　　　　6004-没有此车库ID
 　　　　　　8004-成功
-  返回参数：parking_spaces (List<HashMap>)
-- 使用方法：解析JSON对象，先获取result，如果为2004，则代表操作失败，data里数据为空，如果为8004，则返回一个带有hashMap格式的队列,键值对格式为(pSpace_ID,pSpace_status),ID从1开始取值
+  返回参数：datalist (List<bean>)
+  返回格式：{"result":0,"dataList":"[{\"ID\":\"1\",\"garage_ID\":\"1\",\"park_ID\":\"1\",\"park_spaceName\":\"dan\",\"start_time\":123456,\"status\":\"1\"}]"}
+- ParkSpace(Bean)构造：String ID,String park_ID, String park_spaceName, String garage_ID, String status, long start_time
+- 使用方法：解析JSON对象，先获取result，如果为2004，则代表操作失败，data里数据为空，如果为8004，则返回一个带有List<bean>格式的队列,用Bean来逐个解析list
 
 #####预约车位
 _ _ _
 
 - 功能：App向服务器进行请求更改某一个车位的状态信息
 - 描述：
-- 请求地址(url):ep-guide/api/xxx.java
-- 提交格式：{"action":xxx, "data":"{...}"};
+- 请求地址(url):http://localhost:8080/EP-Guide/orderParkSpace
+- 提交格式：{"action":"1005", "token":"078701c50c5f0fd4395ecd284c645439","garage_ID":"1","car_ID":"1","pSpace_ID":"1"}
   提交命令字：1005-请求更改某一个车位的状态信息（空闲->占用）
-  提交参数：garage_ID,pSpace_ID,car_ID
+  提交参数：garage_ID,pSpace_ID,car_ID,token
 - 返回格式：{"result":xxx, "data":"{…}"};
   返回命令字：2005-失败
 　　　　　　8005-成功
   返回参数：null
-- 使用方法：解析JSON对象，先获取result，2005，则代表操作失败，data里数据为空
+- 使用方法：解析JSON对象，先获取result，如果为2004，则代表操作失败，data里数据为空，如果为8004，则返回一个带有hashMap格式的队列,键值对格式为(pSpace_ID,pSpace_status),ID从1开始取值
 
 #####停车记录查询
 _ _ _
