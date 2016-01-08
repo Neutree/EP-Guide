@@ -23,7 +23,8 @@
 
 #####历史停车记录表(history_park)
 - ID (主键) (int)
-- park_ID （停车位ID） （String）
+- car_ID (String)
+- pSpace_ID （停车位ID） （String）
 - garage_ID （车库ID） （String）
 - getIn_time(入库时间) (存时间戳)(long)
 - park_time (停车时长) (存时间戳)(long)
