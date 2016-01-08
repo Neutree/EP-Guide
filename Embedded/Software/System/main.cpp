@@ -2,9 +2,9 @@
 # include "MFRC522.h"
 # include "GPIO.h"
 
-GPIO rfidResetPin(GPIOA,1,GPIO_Mode_Out_PP,GPIO_Speed_50MHz);
-GPIO ledGreen(GPIOB,6,GPIO_Mode_Out_PP,GPIO_Speed_50MHz);
-GPIO ledYellow(GPIOB,7,GPIO_Mode_Out_PP,GPIO_Speed_50MHz);
+/*GPIO rfidResetPin(GPIOA,0,GPIO_Mode_Out_PP,GPIO_Speed_50MHz);*/
+GPIO ledGreen(GPIOB,1,GPIO_Mode_Out_PP,GPIO_Speed_50MHz);
+GPIO ledRed(GPIOB,0,GPIO_Mode_Out_PP,GPIO_Speed_50MHz);
 USART com1(1,115200,true);
 USART com2(2,9600,true);
 
@@ -19,8 +19,11 @@ u8 temp[20];
 int main()
 {
 	//关两个LED
-	ledYellow.SetLevel(1);
+	ledRed.SetLevel(1);
 	ledGreen.SetLevel(1);
+	ledRed.SetLevel(0);
+	TaskManager::DelayS(1);
+	ledGreen.SetLevel(0);
 	//PCD复位
 	rfid1.PCDReset();
 	com1<<"start\n\n\n";
@@ -80,9 +83,9 @@ int main()
 								com1<<"\n";
 								com1.SendData(tagInfo,16);//显示读出的块1的数据
 								if(rfid1.PcdHalt())
-									ledYellow.SetLevel(0);//点亮黄灯
+									ledRed.SetLevel(0);//点亮黄灯
 								else
-									ledYellow.SetLevel(1);//熄灭黄灯
+									ledRed.SetLevel(1);//熄灭黄灯
 
 							}
 						}
@@ -97,7 +100,7 @@ int main()
 		else
 		{
 			ledGreen.SetLevel(1);
-			ledYellow.SetLevel(1);
+			ledRed.SetLevel(1);
 			com1<<"find failed!\n";
 		}
 

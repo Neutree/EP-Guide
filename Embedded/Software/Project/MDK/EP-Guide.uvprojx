@@ -362,7 +362,7 @@
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>USE_STDPEREPH_DRIVER,STM32F10X_MD</Define>
+              <Define>USE_STDPERIPH_DRIVER,STM32F10X_MD</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\Libraries\BSP\USART;..\..\Libraries\Math;..\..\System;..\..\Libraries\BSP\RFID;..\..\Libraries\BSP\GPIO;..\..\App;..\..\System\TaskManager;..\..\Libraries\BSP\SPI</IncludePath>
             </VariousControls>
