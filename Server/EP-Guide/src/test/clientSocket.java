@@ -19,7 +19,7 @@ public class clientSocket {
 			// 2.获取输出流，向服务器发送信息
 			OutputStream os = socket.getOutputStream();//字节输出流
 			PrintWriter pw= new PrintWriter(os);//将输出流包装为打印流
-			pw.write("用户名：admin;密码：123");
+			pw.write("用户名：111;密码：123");
 			pw.flush();
 			System.out.println("已发数据");
 			socket.shutdownOutput();//关闭输出流
