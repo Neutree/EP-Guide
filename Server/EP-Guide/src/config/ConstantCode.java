@@ -33,4 +33,11 @@ public class ConstantCode {
 	public static final int Res_Illegal_User=3001; //非法用户访问
 	public static final int legal_User=3000; //合法用户访问
 	public static final int Res_NotGrageID=6004; //没有此车库ID
+	public static final int Res_parkSpace_FUll=8800; //车位已被占用
+	public static final int Res_parkSpace_Empty=8801; //车位空闲
+	public static final int Res_NotPSpaceID=6005; //没有此车位ID
+	public static final int Res_NotPSpaceHistory=6006; //没有此历史停车记录
+	public static final int Res_Fail_QueryPSpaceStatus=6007; //查询车位状态失败
+	
+	
 }

@@ -15,7 +15,6 @@ import org.json.JSONObject;
 import bean.ParkSpace;
 import config.ConstantCode;
 import database.DBOpreate;
-import net.sf.json.JSONArray;
 
 public class QueryParkSpaces extends HttpServlet {
 
@@ -32,7 +31,6 @@ public class QueryParkSpaces extends HttpServlet {
 		String token = null;// 用户token
 		List<ParkSpace> pSpaces = new ArrayList<ParkSpace>();
 		JSONObject jsonData = new JSONObject();
-		JSONArray dataList = null;
 		JSONObject backnews = new JSONObject();
 
 		// -- 处理接受到的json数据，并验证 --//
@@ -78,6 +76,7 @@ public class QueryParkSpaces extends HttpServlet {
 			e1.printStackTrace();
 		}
 		// 2.2 查询数据库信息
+			//-- 验证token的合法性  --//
 		int isLegal = DBOpreate.checkToken(token);
 		if (isLegal == ConstantCode.Res_Illegal_User) {
 			System.out.println("非法用户！ 拒绝访问！");
@@ -90,16 +89,17 @@ public class QueryParkSpaces extends HttpServlet {
 			response.getWriter().write(backnews.toString());
 			return;
 		}
+		//-- 查询所有的车位信息  --//
 		pSpaces = DBOpreate.queryParkSpaces(garage_ID);// 从数据库中查询所有车位信息
 		System.out.println("pSpaces:" + pSpaces);
 		// -- 把需返回的参数转换成json格式并返回给请求的客户端 --//
 
-		dataList = JSONArray.fromObject(pSpaces);
-		System.out.println("datalist:!!!--  " + dataList);
+		
+		
 		backnews = new JSONObject();
 		try {
 			backnews.put("result", result);
-			backnews.put("dataList", dataList.toString());
+			backnews.put("dataList", pSpaces);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

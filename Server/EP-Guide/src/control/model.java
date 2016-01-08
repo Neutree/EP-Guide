@@ -76,7 +76,7 @@ public class model extends HttpServlet{
 				response.getWriter().write(backnews.toString());
 				return;
 			} else {
-				boolean isSucs = DBOpreate.();// 操作数据库
+				boolean isSucs =false;// 操作数据库
 				if (isSucs) {
 					result = ConstantCode.Res_OrderParkSpace;
 				} else {

@@ -44,7 +44,7 @@ public class OrderParkSpace extends HttpServlet {
 			jsonData = new JSONObject(receiveData);
 			System.out.println("Info , RecData : " + jsonData.toString());
 			action = jsonData.getInt("action");
-			System.out.println("action="+action);
+			System.out.println("action=" + action);
 		} catch (JSONException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -52,7 +52,7 @@ public class OrderParkSpace extends HttpServlet {
 		// 2.1 判断是否请求命令字是否相符
 		if (action != ConstantCode.Req_OrderParkSpace) {
 			result = ConstantCode.Res_Fail_OrderParkSpace;// 失败则状态码返回2005
-			System.out.println("命令字有误:"+action);
+			System.out.println("命令字有误:" + action);
 			backnews = resResult(result, backnews);
 			response.getWriter().write(backnews.toString());
 			return;
@@ -62,7 +62,7 @@ public class OrderParkSpace extends HttpServlet {
 			pSpace_ID = jsonData.getString("pSpace_ID");
 			car_ID = jsonData.getString("car_ID");
 			token = jsonData.getString("token");
-			System.out.println("car_ID1:" + car_ID+"请求停车");
+			System.out.println("car_ID1:" + car_ID + "请求停车");
 		} catch (JSONException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -77,12 +77,20 @@ public class OrderParkSpace extends HttpServlet {
 				backnews = resResult(result, backnews);
 				response.getWriter().write(backnews.toString());
 				return;
-			} else {
-				boolean isSucs = DBOpreate.orderParkSpace(Integer.valueOf(garage_ID), pSpace_ID, car_ID);// 预定车位
-				if (isSucs) {
-					result = ConstantCode.Res_OrderParkSpace;
-				} else {
-					result = ConstantCode.Res_Fail_OrderParkSpace;
+			} else {// 操作数据库
+				int backRes = DBOpreate.queryPSpaceStatus(garage_ID, pSpace_ID);
+				if (backRes == ConstantCode.Res_parkSpace_Empty) {
+					boolean isSucs = DBOpreate.orderParkSpace(Integer.valueOf(garage_ID), pSpace_ID, car_ID);// 预定车位
+					if (isSucs) {
+						result = ConstantCode.Res_OrderParkSpace;
+					} else {
+						result = ConstantCode.Res_Fail_OrderParkSpace;
+					}
+				}
+				else if(backRes == ConstantCode.Res_parkSpace_FUll){
+					result = ConstantCode.Res_parkSpace_FUll;//如果车位已满则返回8800
+				}else if(backRes == ConstantCode.Res_NotPSpaceID){
+					result = ConstantCode.Res_NotPSpaceID;
 				}
 			}
 		} else {

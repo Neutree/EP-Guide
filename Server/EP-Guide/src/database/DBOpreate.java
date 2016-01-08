@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import bean.ParkHistory;
 import bean.ParkSpace;
 import config.ConstantCode;
 import tools.Encrypt;
@@ -232,14 +233,60 @@ public class DBOpreate {
 		}
 		return pSpaces;
 	}
-
+	
+	public static int queryPSpaceStatus(String garage_ID, String pSpace_ID) {
+		// -- 变量初始化 --//
+		String sqlexcu = null;
+		boolean sucsFlag = false;
+		DBHelper db = new DBHelper();
+		ResultSet rs = null;
+		int backResult=0;
+		// -- 更改车位状态 --//
+		try {
+			sqlexcu = "Select * From parking_spaces where garage_ID=? And pSpace_ID=? ";
+			db.preState = db.con.prepareStatement(sqlexcu);
+			db.preState.setString(1, garage_ID);
+			db.preState.setString(2, pSpace_ID);
+			rs = db.preState.executeQuery();
+			if (rs.next()) {
+				int status = rs.getInt(5);
+				int isOrder = rs.getInt(8);
+				System.out.println("Info , 查询车库车位状态信息成功 ， status = " + status+" isOrder= "+isOrder);
+				if (status==1 || isOrder==1) {
+					backResult = ConstantCode.Res_parkSpace_FUll;
+				}
+				else {
+					backResult = ConstantCode.Res_parkSpace_Empty;
+				}
+			} else {
+				backResult = ConstantCode.Res_NotPSpaceID;// 没有此车位ID
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("Abnormal , DB : 预约车位时更改车位表异常： ");
+			e.printStackTrace();
+			return ConstantCode.Res_Fail_QueryPSpaceStatus;
+		}
+		try {
+			db.sql.close();
+			db.con.close();
+			rs.close();
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("Abnormal , DB : 预约车位时关闭数据库异常： ");
+			e.printStackTrace();
+			backResult = ConstantCode.Res_Fail_QueryPSpaceStatus;
+		}
+		return backResult;
+	}
+	
 	public static boolean orderParkSpace(int garage_ID, String pSpace_ID, String car_ID) {
 		// -- 变量初始化 --//
 		String sqlexcu = null;
 		boolean sucsFlag = false;
 		DBHelper db = new DBHelper();
 
-		// -- 通过获取车库Id获取所有车位信息 --//
+		// -- 更改车位状态 --//
 		try {
 			int isOrder=1,status=1;
 			long start_time= System.currentTimeMillis();
@@ -304,5 +351,41 @@ public class DBOpreate {
 		}
 		return 0;// 表示操作失败
 	}
+	
+	public static List<ParkHistory> queryHistory(String car_ID) {
+		// -- 变量初始化 --//
+		String sqlexcu = null;
+		DBHelper db = new DBHelper();
+		ResultSet rs = null;
+		
+		List<ParkHistory> parkHistories= new ArrayList<ParkHistory>();
+		
+		// -- 查询历史停车记录 --//
+		try {
+			sqlexcu = "Select * From history_park where car_ID=?  ";
+			db.preState = db.con.prepareStatement(sqlexcu);
+			db.preState.setString(1, car_ID);
+			rs = db.preState.executeQuery();
+			if (rs.next()) {
+				String carID = rs.getString(2);
+				String pSpace_ID = rs.getString(3);
+				String garage_ID = rs.getString(4);
+				long getIn_time = rs.getLong(5);
+				long park_time = rs.getLong(6);
+				ParkHistory parked=new ParkHistory(carID, pSpace_ID, garage_ID, getIn_time, park_time);
+				parkHistories.add(parked);
+				System.out.println("Info , 查询车库车位信息成功 ， parked = " + parked.toString());
+			} else {
+				System.out.println("Info , 没有此车位的历史停车信息");
+				return null;
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("Abnormal , DB : 查询历史停车信息时数据库异常： ");
+			e.printStackTrace();
+		}
+		return parkHistories;
+	}
 
+	
 }
