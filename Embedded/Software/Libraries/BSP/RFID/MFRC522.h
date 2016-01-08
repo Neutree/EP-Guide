@@ -25,7 +25,7 @@
 
 ////////////////////////define what ways to communicate with MFRC522 module, One of them or both of them
 						#define MFRC522_USE_USART       //uncomment ir if use USART ot communicate with MFRC522 
-						#define MFRC522_USE_SPI         //uncomment it if use SPI to communicate with MFRC522
+//						#define MFRC522_USE_SPI         //uncomment it if use SPI to communicate with MFRC522
 
 //////////////////////// buffer size
 						#define MFRC522_MaxReceiveLen 18   //用来当缓冲区和临时变量使用的

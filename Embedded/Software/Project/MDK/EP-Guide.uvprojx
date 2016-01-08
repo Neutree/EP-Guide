@@ -422,11 +422,6 @@
               <FileType>8</FileType>
               <FilePath>..\..\Libraries\BSP\GPIO\GPIO.cpp</FilePath>
             </File>
-            <File>
-              <FileName>SPI.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\Libraries\BSP\SPI\SPI.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>

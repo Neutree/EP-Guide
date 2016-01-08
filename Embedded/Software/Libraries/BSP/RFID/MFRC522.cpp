@@ -22,12 +22,14 @@ MFRC522::MFRC522(USART *usart,GPIO *reset,GPIO *pctrl)
 	
 	
 }
+#ifdef MFRC522_USE_SPI
 MFRC522::MFRC522(SPI *spi,GPIO *reset,GPIO *pctrl)
 :mResetPin(*reset),mPctrlPin(*pctrl),mUseSPI(true),mSPI(spi)
 {
 	
 	
 }
+#endif
 
 void MFRC522::PCDReset()
 {

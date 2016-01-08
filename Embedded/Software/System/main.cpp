@@ -8,8 +8,8 @@ GPIO ledYellow(GPIOB,7,GPIO_Mode_Out_PP,GPIO_Speed_50MHz);
 USART com1(1,115200,true);
 USART com2(2,9600,true);
 
-SPI spi1(SPI1,false,SPI_SPEED_16);
-MFRC522 rfid1(&spi1);
+
+MFRC522 rfid1(&com2);
 
 //PICC默认密码(6个字节均为0xff)
 const unsigned char DefaultKey[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};

@@ -16,27 +16,8 @@
 #include "TaskManager.h"
 
 
-////////////////////////
-///define the speed of SPI
-////////////////////////
-typedef enum
-{
-	SPI_SPEED_2  = 0,  //72/2=36MHz
-	SPI_SPEED_8  = 1,  //72/8=9MHz
-	SPI_SPEED_16 = 2,  //72/16=4.5MHz
-	SPI_SPEED_256= 3   //72/256=281.25kHz
-}SPI_Speed;
 
-/////////////////////////
-///define the first bit of transfer LSB or MSB
-////////////////////////
-typedef enum
-{
-	SPI_FirstBit_MSB_ = ((uint16_t)0x0000),
-	SPI_FirstBit_LSB_ = ((uint16_t)0x0080)
-}SPI_FirstBit;
-
-class SPI{
+class SPI_simulate{
 
 public:	
 	///////////////////////////
@@ -46,17 +27,8 @@ public:
 	///@param speed speed of SPI default:SPI_SPEED_256(281.25kHz) @see SPI_Speed 
 	///@param firstBit the first bit of transfer LSB or MSB @see SPI_FirstBit  default:SPI_FirstBit_MSB_
 	//////////////////////////
-	SPI(SPI_TypeDef* spi,bool remap=false,SPI_Speed speed=SPI_SPEED_256,SPI_FirstBit firstBit=SPI_FirstBit_MSB_);
+	SPI_simulate(SPI_TypeDef* spi,bool remap=false);
 
-	/////////////////////////////////////
-	///@param speed the speed of SPI @see SPI_Speed
-	//////////////////////////////////////
-	void SetSpeed(SPI_Speed speed);
-
-	/////////////////////////////////////
-	///@retval speed the speed of SPI @see SPI_Speed
-	//////////////////////////////////////
-	SPI_Speed GetSpeed(void);
 
 
 	///////////////////////////////
