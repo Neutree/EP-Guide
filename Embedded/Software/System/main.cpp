@@ -52,6 +52,7 @@ int main()
 			com1<<"write fail\n";
 		com1<<"value: "<<rfid1.ReadRawRC(2)<<"\n\n\n\n\n\n";
 		
+		temp2=11;
 		
 		if(rfid1.PcdRequest(MFRC522_PICC_REQALL,tagInfo))//寻到卡
 		{
