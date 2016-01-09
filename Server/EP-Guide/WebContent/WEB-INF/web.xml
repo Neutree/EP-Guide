@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--XML声明 -->
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:web="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+  <servlet>
+    <servlet-name>HandleRegister</servlet-name>
+    <servlet-class>control.Register</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HandleRegister</servlet-name>
+    <url-pattern>/register</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>HandleLogin</servlet-name>
+    <servlet-class>control.Login</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HandleLogin</servlet-name>
+    <url-pattern>/login</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>HandleLogout</servlet-name>
+    <servlet-class>control.Logout</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HandleLogout</servlet-name>
+    <url-pattern>/logout</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>HandleTokenLogin</servlet-name>
+    <servlet-class>control.TokenLogin</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HandleTokenLogin</servlet-name>
+    <url-pattern>/tokenLogin</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>HandleOrderParkSpace</servlet-name>
+    <servlet-class>control.OrderParkSpace</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HandleOrderParkSpace</servlet-name>
+    <url-pattern>/orderParkSpace</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>HandleQueryParkSpaces</servlet-name>
+    <servlet-class>control.QueryParkSpaces</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HandleQueryParkSpaces</servlet-name>
+    <url-pattern>/queryParkSpaces</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>HandleQueryParkHistory</servlet-name>
+    <servlet-class>control.QueryParkHistory</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HandleQueryParkHistory</servlet-name>
+    <url-pattern>/queryParkHistory</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>HandleHeartBeat</servlet-name>
+    <servlet-class>control.HeartBeat</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HandleHeartBeat</servlet-name>
+    <url-pattern>/heartBeat</url-pattern>
+  </servlet-mapping>
+  
+</web-app>
