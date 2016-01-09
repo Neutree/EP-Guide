@@ -81,12 +81,11 @@ public class DBOpreate {
 			db.preState.setString(1, db_token);
 			db.preState.setString(2, db_uname);
 			db.preState.setString(3, db_pwd);
-			int orptRow=db.preState.executeUpdate();
-			if (orptRow>0) {
-				System.out.println("Info , 更改token成功 ，token："+db_token);
-			}
-			else {
-				db_token="2001";
+			int orptRow = db.preState.executeUpdate();
+			if (orptRow > 0) {
+				System.out.println("Info , 更改token成功 ，token：" + db_token);
+			} else {
+				db_token = "2001";
 				System.out.println("Info , 更改token失败 ");
 			}
 		} catch (Exception e) {
@@ -213,6 +212,17 @@ public class DBOpreate {
 				ParkSpace pSpace = new ParkSpace(ID, park_ID, park_spaceName, garage_ID, status, start_time);
 				pSpaces.add(pSpace);
 				System.out.println("Info , 查询车库车位信息成功 ， pSpace = " + pSpace.toString());
+				while (rs.next()) {
+					ID = rs.getString(1);
+					park_ID = rs.getString(2);
+					park_spaceName = rs.getString(3);
+					garage_ID = rs.getString(4);
+					status = rs.getString(5);
+					start_time = rs.getLong(6);
+					pSpace = new ParkSpace(ID, park_ID, park_spaceName, garage_ID, status, start_time);
+					pSpaces.add(pSpace);
+					System.out.println("Info , 查询车库车位信息成功 ， pSpace = " + pSpace.toString());
+				}
 			} else {
 				return null;// 没有此车库ID
 			}
@@ -233,14 +243,14 @@ public class DBOpreate {
 		}
 		return pSpaces;
 	}
-	
+
 	public static int queryPSpaceStatus(String garage_ID, String pSpace_ID) {
 		// -- 变量初始化 --//
 		String sqlexcu = null;
 		boolean sucsFlag = false;
 		DBHelper db = new DBHelper();
 		ResultSet rs = null;
-		int backResult=0;
+		int backResult = 0;
 		// -- 更改车位状态 --//
 		try {
 			sqlexcu = "Select * From parking_spaces where garage_ID=? And pSpace_ID=? ";
@@ -251,11 +261,10 @@ public class DBOpreate {
 			if (rs.next()) {
 				int status = rs.getInt(5);
 				int isOrder = rs.getInt(8);
-				System.out.println("Info , 查询车库车位状态信息成功 ， status = " + status+" isOrder= "+isOrder);
-				if (status==1 || isOrder==1) {
+				System.out.println("Info , 查询车库车位状态信息成功 ， status = " + status + " isOrder= " + isOrder);
+				if (status == 1 || isOrder == 1) {
 					backResult = ConstantCode.Res_parkSpace_FUll;
-				}
-				else {
+				} else {
 					backResult = ConstantCode.Res_parkSpace_Empty;
 				}
 			} else {
@@ -279,7 +288,7 @@ public class DBOpreate {
 		}
 		return backResult;
 	}
-	
+
 	public static boolean orderParkSpace(int garage_ID, String pSpace_ID, String car_ID) {
 		// -- 变量初始化 --//
 		String sqlexcu = null;
@@ -288,8 +297,8 @@ public class DBOpreate {
 
 		// -- 更改车位状态 --//
 		try {
-			int isOrder=1,status=1;
-			long start_time= System.currentTimeMillis();
+			int isOrder = 1, status = 1;
+			long start_time = System.currentTimeMillis();
 			sqlexcu = "UPDATE parking_spaces SET car_ID=?,status=?,isOrder=?,start_time=? WHERE garage_ID=? And pSpace_ID=?";
 			db.preState = db.con.prepareStatement(sqlexcu);
 			db.preState.setString(1, car_ID);
@@ -298,16 +307,15 @@ public class DBOpreate {
 			db.preState.setLong(4, start_time);
 			db.preState.setInt(5, garage_ID);
 			db.preState.setString(6, pSpace_ID);
-			int orptRow=db.preState.executeUpdate();
-			if (orptRow>0) {
-				sucsFlag=true;
-				System.out.println("Info , 预约车位成功 ，车位ID："+pSpace_ID);
+			int orptRow = db.preState.executeUpdate();
+			if (orptRow > 0) {
+				sucsFlag = true;
+				System.out.println("Info , 预约车位成功 ，车位ID：" + pSpace_ID);
+			} else {
+				sucsFlag = false;
+				System.out.println("Info , 预约车位失败 ，车位ID：" + pSpace_ID);
 			}
-			else {
-				sucsFlag=false;
-				System.out.println("Info , 预约车位失败 ，车位ID："+pSpace_ID);
-			}
-			
+
 		} catch (Exception e) {
 			// TODO: handle exception
 			System.out.println("Abnormal , DB : 预约车位时更改车位表异常： ");
@@ -351,15 +359,15 @@ public class DBOpreate {
 		}
 		return 0;// 表示操作失败
 	}
-	
+
 	public static List<ParkHistory> queryHistory(String car_ID) {
 		// -- 变量初始化 --//
 		String sqlexcu = null;
 		DBHelper db = new DBHelper();
 		ResultSet rs = null;
-		
-		List<ParkHistory> parkHistories= new ArrayList<ParkHistory>();
-		
+
+		List<ParkHistory> parkHistories = new ArrayList<ParkHistory>();
+
 		// -- 查询历史停车记录 --//
 		try {
 			sqlexcu = "Select * From history_park where car_ID=?  ";
@@ -372,9 +380,19 @@ public class DBOpreate {
 				String garage_ID = rs.getString(4);
 				long getIn_time = rs.getLong(5);
 				long park_time = rs.getLong(6);
-				ParkHistory parked=new ParkHistory(carID, pSpace_ID, garage_ID, getIn_time, park_time);
+				ParkHistory parked = new ParkHistory(carID, pSpace_ID, garage_ID, getIn_time, park_time);
 				parkHistories.add(parked);
 				System.out.println("Info , 查询车库车位信息成功 ， parked = " + parked.toString());
+				while (rs.next()) {
+					carID = rs.getString(2);
+					pSpace_ID = rs.getString(3);
+					garage_ID = rs.getString(4);
+					getIn_time = rs.getLong(5);
+					park_time = rs.getLong(6);
+					parked = new ParkHistory(carID, pSpace_ID, garage_ID, getIn_time, park_time);
+					parkHistories.add(parked);
+					System.out.println("Info , 查询车库车位信息成功 ， parked = " + parked.toString());
+				}
 			} else {
 				System.out.println("Info , 没有此车位的历史停车信息");
 				return null;
@@ -387,5 +405,4 @@ public class DBOpreate {
 		return parkHistories;
 	}
 
-	
 }

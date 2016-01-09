@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import bean.ParkSpace;
 import config.ConstantCode;
 import database.DBOpreate;
+import net.sf.json.JSONArray;
 
 public class QueryParkSpaces extends HttpServlet {
 
@@ -31,7 +32,7 @@ public class QueryParkSpaces extends HttpServlet {
 		String token = null;// 用户token
 		List<ParkSpace> pSpaces = new ArrayList<ParkSpace>();
 		JSONObject jsonData = new JSONObject();
-		JSONObject backnews = new JSONObject();
+		net.sf.json.JSONObject backnews=new net.sf.json.JSONObject();
 
 		// -- 处理接受到的json数据，并验证 --//
 		request.setCharacterEncoding("UTF-8");
@@ -91,18 +92,15 @@ public class QueryParkSpaces extends HttpServlet {
 		}
 		//-- 查询所有的车位信息  --//
 		pSpaces = DBOpreate.queryParkSpaces(garage_ID);// 从数据库中查询所有车位信息
-		System.out.println("pSpaces:" + pSpaces);
-		// -- 把需返回的参数转换成json格式并返回给请求的客户端 --//
-
+		System.out.println("pSpaces Num:" + pSpaces.size());
 		
+		// -- 把需返回的参数转换成json格式 --//	
+		JSONArray dataList=JSONArray.fromObject(pSpaces);		
+		backnews.put("result", result);
+		backnews.put("dataList", dataList);
+		System.out.println("backmsg : "+backnews.toString());
 		
-		backnews = new JSONObject();
-		try {
-			backnews.put("result", result);
-			backnews.put("dataList", pSpaces);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		//-- 返回给请求的客户端 --//
 		response.setCharacterEncoding("UTF-8");
 		response.getWriter().write(backnews.toString());
 	}

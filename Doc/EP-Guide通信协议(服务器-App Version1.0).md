@@ -65,7 +65,7 @@ _ _ _
 - 功能：App向服务器请求各个车位的信息
 - 描述：
 - 请求地址(url):http://localhost:8080/EP-Guide/queryParkSpaces
-- 提交格式：{"action":"1004", "token":"078701c50c5f0fd4395ecd284c645439","garage_ID":"1"}
+- 提交格式：{"action":"1004", "token":"c400f9448fc28b62be1f8ebe13013645","garage_ID":"1"}
   提交命令字：1004-请求车库里所有车位信息
   提交参数：garage_ID,token
 - 返回格式：{"result":xxx, "data":"{…}"};

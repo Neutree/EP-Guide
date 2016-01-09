@@ -41,6 +41,6 @@
 |    2    | 节点信息同步通知响应 | cAckNotNodeInforSync | 0x0808 | Server-网关 |
 | 触发模式 | 车辆入库时触发 |
 |    1    | 最短路线配置请求 | cReqShortLoad | 0x0103 | 网关-Server |
-|    2    | 最短路线配置请求 | cAckShortLoad | 0x0803 | Server-网关 |
+|    2    | 最短路线配置响应 | cAckShortLoad | 0x0803 | Server-网关 |
 |    3    | 车位数量同步请求 | cReqShortLoad | 0x0109 | 网关-Server |
 |    4    | 车位数量同步响应 | cAckShortLoad | 0x0809 | Server-网关 |
