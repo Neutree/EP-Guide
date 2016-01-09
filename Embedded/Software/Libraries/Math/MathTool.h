@@ -1,6 +1,6 @@
 #ifndef __MATH_TOOL_H
 #define __MATH_TOOL_H
-class MathToll
+class MathTool
 {
 public:
 	/*

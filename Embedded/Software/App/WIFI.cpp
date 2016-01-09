@@ -18,7 +18,7 @@ char WIFI::mJoinApPassword[20]="morenimei0";
 char WIFI::mStationMac[18]="12:08:07:72:07:01";
 
 //server
-char WIFI::mServerIPOrDomain[30]="192.168.191.5";
+char WIFI::mServerIPOrDomain[30]="192.168.191.1";
 uint32_t WIFI::mServerPort=5080;
 	
 /********************************************************/

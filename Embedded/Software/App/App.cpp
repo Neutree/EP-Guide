@@ -22,7 +22,8 @@ mBuzzer(mBuzzerGPIO,false),
 mRFID(&mCOM2),
 mWIFI(mCOM1,115200)	
 {
-	mReqLinkCheckInterval=10;        //心跳包间隔10s
+	mReqLinkCheckInterval=30;        //心跳包间隔30s
+	mToServerConnectionHealth=-1;    //与服务器的连接初始化为失去连接
 }
 
 
@@ -43,11 +44,6 @@ void APP::InitHardware()
 	mLedRed.Off();
 	mLedGreen.Off();
 	
-	TaskManager::DelayS(1);
-	mLedGreen.On();
-	TaskManager::DelayS(1);
-	mLedGreen.Toggle();
-	
 	//PCD复位
 	mRFID.PCDReset();
 	
@@ -55,7 +51,18 @@ void APP::InitHardware()
 	WIFI::Init(mWIFI);
 	
 	
-	
+	mCOM1<<"Initialize complete\n\n\n";
+	for(u8 i=0;i<10;++i)
+	{
+		mLedGreen.On();
+		mLedRed.Off();
+		TaskManager::DelayMs(100);
+		mLedGreen.Off();
+		mLedRed.On();
+		TaskManager::DelayMs(100);
+	}
+	mLedRed.Off();
+	mCOM1.ClearReceiveBuffer();
 }
 
 ///////////////////////////////
@@ -63,6 +70,7 @@ void APP::InitHardware()
 //////////////////////////////
 void APP::InitSoft()
 {
+	//登录服务器
 	
 }
 
@@ -134,8 +142,7 @@ else
 /***************************************************************/
 	
 
-/*************************--③--节点发来的信息处理********************/
-
+/****************--③--接收到的信息处理（取出完整的有效数据帧）**********/
 
 /********************************************************************/
 
@@ -149,6 +156,30 @@ heartBeatTimeNew=TaskManager::Time();
 //时间到发送链路请求
 if(heartBeatTimeNew-heartBeatTimeOld>=mReqLinkCheckInterval)
 {
+	HeartBeatRequest();
+	WaitHeartBeatRequest();
+	heartBeatTimeOld=heartBeatTimeNew;
+}
+if(mToServerConnectionHealth==-1)//失去与服务器的连接
+{
+	
+}
+
+//检测来自服务器的链路响应
+
+/********************************************************************/
+
+
+
+
+
+
+}
+
+
+
+void APP::HeartBeatRequest()
+{
 	//心跳包数据合成
 	uint16_t temp=Communicate::ToServerGenerateMessageID();
 	Communicate::mToServerLinkCheckPack[2]=temp>>8;//消息ID高字节
@@ -161,36 +192,107 @@ if(heartBeatTimeNew-heartBeatTimeOld>=mReqLinkCheckInterval)
 	Communicate::mToServerLinkCheckPack[12]=TO_SERVER_cReqLinkCheck>>8;//命令字高字节
 	Communicate::mToServerLinkCheckPack[13]=TO_SERVER_cReqLinkCheck&0x00ff;//命令字低字节
 	
-	Communicate::mToServerLinkCheckPack[14]=MathToll::CheckSum8((unsigned char*)Communicate::mToServerLinkCheckPack,14);
+	Communicate::mToServerLinkCheckPack[14]=MathTool::CheckSum8((unsigned char*)Communicate::mToServerLinkCheckPack,14);
 	
 	Communicate::SendBytesToServer(mWIFI,WIFI::mServerIPOrDomain,WIFI::mServerPort,Communicate::mToServerLinkCheckPack,15);
-	heartBeatTimeOld=heartBeatTimeNew;
-}
-//检测来自服务器的链路响应
-
-/********************************************************************/
-
-
-
-/*************************--④--服务器发来的信息处理********************/
-
-
-/********************************************************************/
-
-
-
-
+	mToServerConnectionHealth=0;//标志正在检测
 }
 
 
+///////////////////////////
+///向服务器发送链路请求（心跳，定时进行）
+///////////////////////////
+void APP::WaitHeartBeatRequest()
+{
+	mToServerConnectionHealth=0;
+	if(WaitReceiveAndDecode())
+	{
+		if(mBuffer[10]==0&&mBuffer[11]==0&&mBuffer[12]==(TO_SERVER_cAckLinkCheck>>8)&&(mBuffer[13]==(u8)TO_SERVER_cAckLinkCheck))
+		{
+			mToServerConnectionHealth=1;//链路正确
+		}
+	}
+	if(mToServerConnectionHealth==0)
+	{
+		mToServerConnectionHealth=-1;
+	}
+}
 
 
+//////////////////////////
+///超时等待信息到来，收到的信息将有效信息存到mBuffer开头
+/////////////////////////
+bool APP::WaitReceiveAndDecode(unsigned char timeOut)
+{
+	double time=TaskManager::Time();
+	unsigned char temp=0;
+	unsigned char count=0,count2=0;
+	uint16_t length=0;
+	while(1)
+	{
+		if(TaskManager::Time()-time>timeOut)
+		{
+			
+			break;
+		}
+		
+		if(mCOM1.ReceiveBufferSize()+count>=25)
+		{
+			while(mCOM1.ReceiveBufferSize()>0)
+			{
+				mCOM1.GetReceivedData(&temp,1);
+				if(temp=='+'&&count==0)
+				{
+					count++;
+				}
+				else if(temp=='I'&&count==1)
+					count++;
+				else if(temp=='P'&&count==2)
+					count++;
+				else if(temp=='D'&&count==3)
+					count++;
+				else if(temp==',' &&count==4)
+					count++;
+				else if(count==5)
+					count++;
+				else if(temp==','&&count==6)
+					count++;
+				else if(temp!=':'&&count==7)//长度
+				{
+					++count;
+					length=(temp-'0');
+				}
+				else if(temp!=':'&&count==8)
+				{
+					++count;
+					length=length*10+(temp-'0');
+				}
+				else if(temp==':'&& count>6)//后面的数据都是服务器发来的消息
+				{
+					count=24;
+				}
+				else if(count==24)//数据
+				{
+					mBuffer[count2++]=temp;//放进缓冲区
+					
+					if(count2>=length)
+					{
 
-
-
-
-
-
+						u16 dataLength=((unsigned short)mBuffer[10])<<8|mBuffer[11];
+						//数据验证有效性
+						if(mBuffer[0]==0xA4&&mBuffer[1]==0x02&&mBuffer[14+dataLength]==MathTool::CheckSum8(mBuffer,dataLength+14))//数据头和校验正确
+						{
+							return true;
+							
+						}
+						return false;
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
 
 
 
