@@ -15,17 +15,23 @@
 |--------|--------|
 | 消息头 | 消息ID | 网关Mac地址 | 消息体长度 | 命令字 | 消息体 | 校验字 |
 | gMsgHead | gMsgID | gGtwMac | gMsgLen | bMsgCmd | bMsgBody | bMsgVrf |
-| 2Byte | 2Byte | 8Byte | 2Byte | 2Byte | nByte | 1Byte |
+| 2Byte | 2Byte | 6Byte | 2Byte | 2Byte | nByte | 1Byte |
+**其中需要注意的如下：**
+* 其中消息头固定：为**0xA4**（先发)**0x02**（后发）
+* 消息ID无符号两字节，递增
+* 登录时在MAC地址后加<kbd>A-402</kbd>字串，然后对其合并后用MD5进行加密
+* 高字节在前（先发高字节，再发低字节）
+* 消息长度为消息体长度
 
 #####三、 命令集
 
 | 命令分类 | 命令描述 | 命令字 | 命令编码 | 传输方向 |
 |--------|--------|
 | 基本请求 | 登录、心跳包等 |
-|    1    |网关登录服务器请求 | cReqGateWayLogin | 0x0101 | 网关-Server |
-|    2    | 服务器响应网关登录 | cAckGateWayLogin | 0x0801 | Server-网关 |
-|    3    | 链路请求 | cReqLinkCheck | 0x0102 | 网关-Server |
-|    4    | 链路请求响应 | cAckLinkCheck | 0x0802 | Server-网关 |
+|    1    |网关登录服务器请求      | cReqGateWayLogin | 0x0101 | 网关-Server |
+|    2    | 服务器响应网关登录     | cAckGateWayLogin | 0x0801 | Server-网关 |
+|    3    | 链路请求(消息体空)     | cReqLinkCheck | 0x0102 | 网关-Server |
+|    4    | 链路请求响应(消息体空) | cAckLinkCheck | 0x0802 | Server-网关 |
 | 节点操作 | 管理员操作时更改 |
 |    1    | 节点添加请求 | cReqAddNode | 0x0104 | 网关-Server |
 |    2    | 节点添加响应 | cAckAddNode | 0x0804 | Server-网关 |

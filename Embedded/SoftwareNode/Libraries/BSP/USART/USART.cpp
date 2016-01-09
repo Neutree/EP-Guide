@@ -447,24 +447,7 @@ USART& USART::operator<<(int val)
 	SendData(data+10-len,len);
 	return *this;
 }
-///////////////////////////
-///@brief print 32bit unsigned integer reload
-///@param val the integer value that will be print to USART as characters
-///////////////////////////
-USART& USART::operator<<(uint32_t val)
-{
-	u8 sign = 0, len = 0,data[10];
-	do
-	{
-		len++;
-		data[10-len] = val%10 + '0';
-		val = val/10;
-	}while(val);
-	if(sign==1)
-		data[10-(++len)] = '-';
-	SendData(data+10-len,len);
-	return *this;
-}
+
 
 USART& USART::operator<<(double val)
 {

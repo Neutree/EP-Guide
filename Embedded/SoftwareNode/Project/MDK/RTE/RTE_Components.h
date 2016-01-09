@@ -4,7 +4,7 @@
  *      *** Do not modify ! ***
  *
  * Project: 'EP-Guide' 
- * Target:  'EP-Guide-Master' 
+ * Target:  'EP-Guiede-node' 
  */
 
 #ifndef RTE_COMPONENTS_H
