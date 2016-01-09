@@ -10,6 +10,8 @@ char WIFI::mSoftApNetmask[16]="255.255.255.0";
 uint32_t WIFI::mSoftApPort=345;
 uint16_t WIFI::mSoftApClientTimeOut=180;//s
 //Station
+//char WIFI::mJoinApName[13]="nomore";
+//char WIFI::mJoinApPassword[20]="morenimei0";
 char WIFI::mJoinApName[13]="ICanHearYou";
 char WIFI::mJoinApPassword[20]="1208077207";
 char WIFI::mStationMac[18]="12:08:07:72:07:01";
