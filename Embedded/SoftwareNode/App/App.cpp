@@ -71,19 +71,19 @@ void APP::Loop()
 
 
 	//RFID 健康状况,器件存在问题时不会执行--②--
-	if(!mRFID.mHealth)
-	{
-		//一直侦测健康状况
-		if(mRFID.Kick())//检测到，进行状态设置
-		{
-			mRFID.PCDReset();
-			return;
-		}
-		//RFID连接失败处理
-		
-			
-		return;
-	}
+//	if(!mRFID.mHealth)
+//	{
+//		//一直侦测健康状况
+//		if(mRFID.Kick())//检测到，进行状态设置
+//		{
+//			mRFID.PCDReset();
+//			return;
+//		}
+//		//RFID连接失败处理
+//		
+//			
+//		return;
+//	}
 	//WIFI健康状况检查
 	
 /***************************************************************/
@@ -93,18 +93,27 @@ void APP::Loop()
 
 if(mRFID.PcdRequest(MFRC522_PICC_REQALL,mTagInfo))//寻到卡
 {
+	mCOM1<<"find ok\n";
 	if(((u16)mTagInfo[0]<<8|mTagInfo[1])==MFRC522_PICC_MIFARE_ONE_S50)//卡类型：S50
 	{
 		if(mRFID.PcdAntiColl(mTagInfo))//防冲撞成功(找到一张卡序列号)
 		{
-			//显示ID
-			mCOM1<<"Card ID:\t";
-			for(int i=0;i<4;++i)
-				mCOM1<<mTagInfo[i]<<"\t";
-			mCOM1<<"\n";
+			mLedGreen.On();
+			
+			mRFID.PcdHalt();
+		}
+		else
+		{
+			mLedGreen.Off();
 		}
 	}
 }
+else
+{
+	mCOM1<<"find fail\n";
+	mLedGreen.Off();
+}
+mCOM1<<"version:"<<mRFID.ReadRawRC(0x37)<<"\n\n";
 /***************************************************************/
 	
 	

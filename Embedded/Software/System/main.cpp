@@ -1,8 +1,31 @@
+
+# include "App.h"
+
+int main()
+{
+	app.InitHardware();
+	app.InitSoft();
+	while(1)
+	{
+		app.Loop();
+	}
+}
+
+
+
+
+
+
+
+
+
+
+/*
 # include "USART.h"
 # include "MFRC522.h"
 # include "GPIO.h"
 
-/*GPIO rfidResetPin(GPIOA,0,GPIO_Mode_Out_PP,GPIO_Speed_50MHz);*/
+*//*GPIO rfidResetPin(GPIOA,0,GPIO_Mode_Out_PP,GPIO_Speed_50MHz);*//*
 GPIO ledGreen(GPIOB,1,GPIO_Mode_Out_PP,GPIO_Speed_50MHz);
 GPIO ledRed(GPIOB,0,GPIO_Mode_Out_PP,GPIO_Speed_50MHz);
 USART com1(1,115200,true);
@@ -107,4 +130,6 @@ int main()
 
 	}
 }
+
+*/
 
