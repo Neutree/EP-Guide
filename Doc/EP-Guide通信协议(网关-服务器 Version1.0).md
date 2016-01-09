@@ -15,7 +15,7 @@
 |--------|--------|
 | 消息头 | 消息ID | 网关Mac地址 | 消息长度 | 命令字 | 消息体 | 校验字 |
 | gMsgHead | gMsgID | gGtwMac | gMsgLen | bMsgCmd | bMsgBody | bMsgVrf |
-| 2Byte | 2Byte | 8Byte | 2Byte | 2Byte | nByte | 1Byte |
+| 2Byte | 2Byte | 6Byte | 2Byte | 2Byte | nByte | 1Byte |
 
 #####三、 命令集
 
@@ -44,3 +44,12 @@
 |    2    | 最短路线配置响应 | cAckShortLoad | 0x0803 | Server-网关 |
 |    3    | 车位数量同步请求 | cReqShortLoad | 0x0109 | 网关-Server |
 |    4    | 车位数量同步响应 | cAckShortLoad | 0x0809 | Server-网关 |
+
+#####四、 消息体定义
+
+1. 网关登录：
+- 说明：通过网关Mac地址+A-402 合并后用MD5进行加密
+- 消息流：
+| 字节数（2） |
+|--------|--------|
+|   加密字串（n）     |
