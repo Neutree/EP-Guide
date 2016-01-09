@@ -3,7 +3,7 @@
 
 /**************************–≠“È**********************************/
 
-char Communicate::mToServerLinkCheckPack[17]={0xA4,0x02,};
+char Communicate::mToServerLinkCheckPack[15]={0xA4,0x02,};
 
 		
 

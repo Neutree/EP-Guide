@@ -150,11 +150,20 @@ heartBeatTimeNew=TaskManager::Time();
 if(heartBeatTimeNew-heartBeatTimeOld>=mReqLinkCheckInterval)
 {
 	//心跳包数据合成
-	uint16_t messageId=Communicate::ToServerGenerateMessageID();
-	Communicate::mToServerLinkCheckPack[2]=messageId>>8;//消息ID高字节
-	Communicate::mToServerLinkCheckPack[3]=messageId&0x00ff;//消息ID低字节
-	memcpy(&Communicate::mToServerLinkCheckPack[4],WIFI::mStationMac,6);//复制mac地址
-	Communicate::SendBytesToServer(mWIFI,WIFI::mServerIPOrDomain,WIFI::mServerPort,Communicate::mToServerLinkCheckPack,17);
+	uint16_t temp=Communicate::ToServerGenerateMessageID();
+	Communicate::mToServerLinkCheckPack[2]=temp>>8;//消息ID高字节
+	Communicate::mToServerLinkCheckPack[3]=temp&0x00ff;//消息ID低字节
+	char mac[6]={1,2,3,4,5,6};
+	WIFI::MacAddressStringToBytes(WIFI::mStationMac,mac);
+	memcpy(&Communicate::mToServerLinkCheckPack[4],mac,6);//复制mac地址
+	Communicate::mToServerLinkCheckPack[10]=0;//消息体长度：0
+	Communicate::mToServerLinkCheckPack[11]=0;//消息体长度：0
+	Communicate::mToServerLinkCheckPack[12]=TO_SERVER_cReqLinkCheck>>8;//命令字高字节
+	Communicate::mToServerLinkCheckPack[13]=TO_SERVER_cReqLinkCheck&0x00ff;//命令字低字节
+	
+	Communicate::mToServerLinkCheckPack[14]=MathToll::CheckSum8((unsigned char*)Communicate::mToServerLinkCheckPack,14);
+	
+	Communicate::SendBytesToServer(mWIFI,WIFI::mServerIPOrDomain,WIFI::mServerPort,Communicate::mToServerLinkCheckPack,15);
 	heartBeatTimeOld=heartBeatTimeNew;
 }
 //检测来自服务器的链路响应

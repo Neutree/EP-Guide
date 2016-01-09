@@ -11,6 +11,8 @@
 # include "WIFI.h"
 # include "Communicate.h"
 
+#include "MathTool.h"
+
 class APP
 {
 

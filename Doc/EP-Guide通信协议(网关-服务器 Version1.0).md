@@ -22,6 +22,7 @@
 * 登录时在MAC地址后加<kbd>A-402</kbd>字串，然后对其合并后用MD5进行加密
 * 高字节在前（先发高字节，再发低字节）
 * 消息长度为消息体长度
+* 校验字使用和校验 前面所有字节之和对256取余
 
 #####三、 命令集
 
@@ -48,5 +49,5 @@
 | 触发模式 | 车辆入库时触发 |
 |    1    | 最短路线配置请求 | cReqShortLoad | 0x0103 | 网关-Server |
 |    2    | 最短路线配置请求 | cAckShortLoad | 0x0803 | Server-网关 |
-|    3    | 车位数量同步请求 | cReqShortLoad | 0x0109 | 网关-Server |
-|    4    | 车位数量同步响应 | cAckShortLoad | 0x0809 | Server-网关 |
+|    3    | 车位数量同步请求 | cReqParkSpaceNum | 0x0109 | 网关-Server |
+|    4    | 车位数量同步响应 | cAckParkSpaceNum | 0x0809 | Server-网关 |

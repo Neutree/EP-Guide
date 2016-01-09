@@ -24,7 +24,7 @@ public:
 	//station
 	static char mJoinApName[13];
 	static char mJoinApPassword[20];
-	static char mStationMac[6];//固定长度
+	static char mStationMac[18];//固定长度
 	
 	//server
 	static char mServerIPOrDomain[30];
@@ -37,7 +37,7 @@ public:
 	////////////////////////
 	///将字符串形式的MAC地址转换为字节形式的，6个字节
 	///////////////////////
-	static void MacAddressStringToBytes(char* macStr,char** macAddress);
+	static void MacAddressStringToBytes(char* macStr, char macAddress[6]);
 	
 };
 

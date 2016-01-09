@@ -15,11 +15,11 @@ char WIFI::mJoinApName[13]="nomore";
 char WIFI::mJoinApPassword[20]="morenimei0";
 //char WIFI::mJoinApName[13]="ICanHearYou";
 //char WIFI::mJoinApPassword[20]="1208077207";
-char WIFI::mStationMac[6]={0x12,0x08,0x07,0x72,0x07,0x01};
+char WIFI::mStationMac[18]="12:08:07:72:07:01";
 
 //server
-char mServerIPOrDomain[30]="192.168.191.1";
-uint32_t mServerPort=5080;
+char WIFI::mServerIPOrDomain[30]="192.168.191.5";
+uint32_t WIFI::mServerPort=5080;
 	
 /********************************************************/
 
@@ -55,16 +55,15 @@ bool WIFI::Init(esp8266 &wifi)
 ////////////////////////
 ///将字符串形式的MAC地址转换为字节形式的，6个字节
 ///////////////////////
-void WIFI::MacAddressStringToBytes(char* macStr,char** macAddress)
+void WIFI::MacAddressStringToBytes(char* macStr, char macAddress[6])
 {
-	char temp;
-	
-	for(uint8_t i=0;i<17;)
+	char j = 0;
+	for (unsigned char i = 0; i<17;)
 	{
-		(*macAddress)[i]=(uint8_t)(macStr[i]-'0')<<8|(macStr[i+1]-'0');//字符串转字节
-		i+=3;
+		macAddress[j] = (((unsigned short)macStr[i] - '0') * 16)+ (macStr[i + 1] - '0');//字符串转字节
+		i += 3;
+		++j;
 	}
 }
-
 /**********************************************************************/
 
