@@ -22,7 +22,7 @@ mBuzzer(mBuzzerGPIO,false),
 mRFID(&mCOM2),
 mWIFI(mCOM1,115200)	
 {
-	
+	mReqLinkCheckInterval=10;        //心跳包间隔10s
 }
 
 
@@ -134,10 +134,39 @@ else
 /***************************************************************/
 	
 
-/*************************节点发来的信息处理********************/
+/*************************--③--节点发来的信息处理********************/
 
 
-/***************************************************************/
+/********************************************************************/
+
+
+
+/*************************--⑥--链路保持（心跳包），周期为10秒********************/
+static uint32_t heartBeatTimeOld=0;
+static uint32_t heartBeatTimeNew=TaskManager::Time();
+
+heartBeatTimeNew=TaskManager::Time();
+//时间到发送链路请求
+if(heartBeatTimeNew-heartBeatTimeOld>=mReqLinkCheckInterval)
+{
+	//心跳包数据合成
+	uint16_t messageId=Communicate::ToServerGenerateMessageID();
+	Communicate::mToServerLinkCheckPack[2]=messageId>>8;//消息ID高字节
+	Communicate::mToServerLinkCheckPack[3]=messageId&0x00ff;//消息ID低字节
+	memcpy(&Communicate::mToServerLinkCheckPack[4],WIFI::mStationMac,6);//复制mac地址
+	Communicate::SendBytesToServer(mWIFI,WIFI::mServerIPOrDomain,WIFI::mServerPort,Communicate::mToServerLinkCheckPack,17);
+	heartBeatTimeOld=heartBeatTimeNew;
+}
+//检测来自服务器的链路响应
+
+/********************************************************************/
+
+
+
+/*************************--④--服务器发来的信息处理********************/
+
+
+/********************************************************************/
 
 
 

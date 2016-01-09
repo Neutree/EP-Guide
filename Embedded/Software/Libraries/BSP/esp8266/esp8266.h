@@ -641,7 +641,7 @@ class esp8266
      * @retval true - success.
      * @retval false - failure.
      */
-    bool sendMultipleMode(uint8_t mux_id, const uint8_t *buffer, uint32_t len);
+    bool sendMultipleMode(uint8_t mux_id, char *buffer, uint32_t len);
 	/**
      * Send data based on one of TCP or UDP builded already in multiple mode. 
      * 
@@ -677,6 +677,10 @@ class esp8266
      */
     uint32_t recvMultipleModeComingmux_id(uint8_t *coming_mux_id, uint8_t *buffer, uint32_t buffer_size, uint32_t timeout);
 		
+		
+	bool CloseMulitpleSend(uint8_t mux_id);
+	
+	
 private:
 		
 	USART &mUsart;
@@ -767,7 +771,7 @@ private:
     bool sATCIPSTARTSingle(char*  type, char*  addr, uint32_t port);
     bool sATCIPSTARTMultiple(uint8_t mux_id, char*  type, char*  addr, uint32_t port);
     bool sATCIPSENDSingle(const uint8_t *buffer, uint32_t len);
-    bool sATCIPSENDMultiple(uint8_t mux_id, const uint8_t *buffer, uint32_t len);
+    bool sATCIPSENDMultiple(uint8_t mux_id, char *buffer, uint32_t len);
     bool sATCIPSENDSingleFromFlash(const uint8_t *buffer, uint32_t len);
     bool sATCIPSENDMultipleFromFlash(uint8_t mux_id, const uint8_t *buffer, uint32_t len);
     bool sATCIPCLOSEMulitple(uint8_t mux_id);

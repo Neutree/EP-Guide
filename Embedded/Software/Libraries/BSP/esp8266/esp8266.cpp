@@ -634,6 +634,40 @@
 		return recvFindAndFilter("OK", "+CIPAP:", "\r\n\r\nOK", ip);			
 	}
 	
+	
+	bool esp8266::sATCIPSTARTMultiple(uint8_t mux_id, char*  type, char*  addr, uint32_t port)
+	{
+		rx_empty();
+		mUsart<<"AT+CIPSTART="<<mux_id<<",\""<<type<<"\",\""<<addr<<"\","<<port<<"\r\n";							
+		return recvFind("OK");
+	}
+	
+	bool esp8266::sATCIPSENDMultiple(uint8_t mux_id, char *buffer, uint32_t len)
+	{
+		rx_empty();
+		mUsart<<"AT+CIPSEND="<<mux_id<<","<<len<<"\r\n";
+		mUsart<<buffer;
+		return recvFind("OK");
+	}
+	
+	
+	
+	bool esp8266::sATCIPCLOSEMulitple(uint8_t mux_id)
+	{
+		rx_empty();
+		mUsart<<"AT+CIPCLOSE="<<mux_id<<"\r\n";
+		return recvFind("OK");
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	/** 
      * Verify ESP8266 whether live or not. 
      *
@@ -1175,7 +1209,8 @@
      */
     bool esp8266::createTCPMutipleMode(uint8_t mux_id, char* addr, uint32_t port)
 	{
-		return false;
+		char type[]="TCP";
+		return sATCIPSTARTMultiple(mux_id,type,addr,port);
 	}
 	
     
@@ -1340,9 +1375,9 @@
      * @retval true - success.
      * @retval false - failure.
      */
-    bool esp8266::sendMultipleMode(uint8_t mux_id, const uint8_t *buffer, uint32_t len)
+    bool esp8266::sendMultipleMode(uint8_t mux_id, char *buffer, uint32_t len)
 	{
-		return true;
+		return sATCIPSENDMultiple(mux_id,buffer,len);
 	}
     
     /**
@@ -1427,5 +1462,10 @@
 			return true;
 		else//strstr(ssid,"FAIL")
 			return false;
+	}
+	
+	bool esp8266::CloseMulitpleSend(uint8_t mux_id)
+	{
+		return sATCIPCLOSEMulitple(mux_id);
 	}
 

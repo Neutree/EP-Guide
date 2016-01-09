@@ -70,7 +70,7 @@ static const unsigned char mPICCDefaultKey[6];
 
 /*************************私有变量*************************************/
 unsigned char mTagInfo[MFRC522_MaxReceiveLen];
-
+uint16_t mReqLinkCheckInterval; //心跳包间隔定义 单位：S
 
 /*******************************************************************/
 
