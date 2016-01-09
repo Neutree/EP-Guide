@@ -1,4 +1,4 @@
-package test;
+package socket;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class clientSocket {
+public class Client {
 	public static void main(String[] args) {
 		try {
 			// 1.创建客户端Socket,指定服务器地址和端口
