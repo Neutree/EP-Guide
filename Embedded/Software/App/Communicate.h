@@ -64,7 +64,7 @@ class Communicate
 		///////////////////////
 		///链路请求、响应包
 		//////////////////////
-		static char mToServerLinkCheckPack[15];
+		static char mToServerPack[50];
 	
 	
 		/////////////////////////

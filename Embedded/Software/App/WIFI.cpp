@@ -15,7 +15,7 @@ char WIFI::mJoinApName[13]="nomore";
 char WIFI::mJoinApPassword[20]="morenimei0";
 //char WIFI::mJoinApName[13]="ICanHearYou";
 //char WIFI::mJoinApPassword[20]="1208077207";
-char WIFI::mStationMac[18]="12:08:07:72:07:01";
+unsigned char WIFI::mStationMac[18]="12:08:07:72:07:01";
 
 //server
 char WIFI::mServerIPOrDomain[30]="192.168.191.1";
@@ -30,7 +30,7 @@ bool WIFI::Init(esp8266 &wifi)
 
 	wifi.setEcho(1);//关闭回显
 	wifi.setOprToStationSoftAP(1,1);//设置为AP+station模式
-	wifi.setStationMac(mStationMac,1);//set station mac adress
+	wifi.setStationMac((char*)mStationMac,1);//set station mac adress
 	if(!wifi.joinAP(mJoinApName,mJoinApPassword,1))//join ap
 	{
 		

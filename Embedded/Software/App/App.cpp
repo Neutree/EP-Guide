@@ -24,6 +24,7 @@ mWIFI(mCOM1,115200)
 {
 	mReqLinkCheckInterval=30;        //心跳包间隔30s
 	mToServerConnectionHealth=-1;    //与服务器的连接初始化为失去连接
+	mToServerLogInStatus=-1;     	//未登录
 }
 
 
@@ -40,6 +41,9 @@ const unsigned char APP::mPICCDefaultKey[6]= {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 /////////////////////////////
 void APP::InitHardware()
 {
+	//关闭蜂鸣器
+	mBuzzer.Off();
+	
 	//关闭LED
 	mLedRed.Off();
 	mLedGreen.Off();
@@ -71,6 +75,7 @@ void APP::InitHardware()
 void APP::InitSoft()
 {
 	//登录服务器
+	LogIn();
 	
 }
 
@@ -79,8 +84,8 @@ void APP::InitSoft()
 ///循环执行部分
 /////////////////////////////////
 void APP::Loop()
-{
-/****************--①--器件检测	、错误处理**********************/	
+{	
+/****************--①--器件检测	、状态监测、错误处理**********************/	
 
 
 	//RFID 健康状况,器件存在问题时不会执行--②--
@@ -112,35 +117,18 @@ void APP::Loop()
 	{
 		mBuzzer.Off();
 	}
+	
+	if(mToServerLogInStatus==-1)//没有登录
+	{
+		
+	}
 /***************************************************************/
 
 	
 /*********************--②--车辆检测**************************/
 
-if(mRFID.PcdRequest(MFRC522_PICC_REQALL,mTagInfo))//寻到卡
-{
-	mCOM1<<"find ok\n";
-	if(((u16)mTagInfo[0]<<8|mTagInfo[1])==MFRC522_PICC_MIFARE_ONE_S50)//卡类型：S50
-	{
-		if(mRFID.PcdAntiColl(mTagInfo))//防冲撞成功(找到一张卡序列号)
-		{
-			mLedGreen.On();
-			
-			mRFID.PcdHalt();
-		}
-		else
-		{
-			mLedGreen.Off();
-		}
-	}
-}
-else
-{
-	mLedGreen.Off();
-}
-
 /***************************************************************/
-	
+	FindCar();
 
 /****************--③--接收到的信息处理（取出完整的有效数据帧）**********/
 
@@ -180,22 +168,23 @@ if(mToServerConnectionHealth==-1)//失去与服务器的连接
 
 void APP::HeartBeatRequest()
 {
+	mToServerConnectionHealth=0;//标志正在检测
 	//心跳包数据合成
 	uint16_t temp=Communicate::ToServerGenerateMessageID();
-	Communicate::mToServerLinkCheckPack[2]=temp>>8;//消息ID高字节
-	Communicate::mToServerLinkCheckPack[3]=temp&0x00ff;//消息ID低字节
+	Communicate::mToServerPack[2]=temp>>8;//消息ID高字节
+	Communicate::mToServerPack[3]=temp&0x00ff;//消息ID低字节
 	char mac[6]={1,2,3,4,5,6};
-	WIFI::MacAddressStringToBytes(WIFI::mStationMac,mac);
-	memcpy(&Communicate::mToServerLinkCheckPack[4],mac,6);//复制mac地址
-	Communicate::mToServerLinkCheckPack[10]=0;//消息体长度：0
-	Communicate::mToServerLinkCheckPack[11]=0;//消息体长度：0
-	Communicate::mToServerLinkCheckPack[12]=TO_SERVER_cReqLinkCheck>>8;//命令字高字节
-	Communicate::mToServerLinkCheckPack[13]=TO_SERVER_cReqLinkCheck&0x00ff;//命令字低字节
+	WIFI::MacAddressStringToBytes((char*)WIFI::mStationMac,mac);
+	memcpy(&Communicate::mToServerPack[4],mac,6);//复制mac地址
+	Communicate::mToServerPack[10]=0;//消息体长度：0
+	Communicate::mToServerPack[11]=0;//消息体长度：0
+	Communicate::mToServerPack[12]=TO_SERVER_cReqLinkCheck>>8;//命令字高字节
+	Communicate::mToServerPack[13]=TO_SERVER_cReqLinkCheck&0x00ff;//命令字低字节
 	
-	Communicate::mToServerLinkCheckPack[14]=MathTool::CheckSum8((unsigned char*)Communicate::mToServerLinkCheckPack,14);
+	Communicate::mToServerPack[14]=MathTool::CheckSum8((unsigned char*)Communicate::mToServerPack,14);
 	
-	Communicate::SendBytesToServer(mWIFI,WIFI::mServerIPOrDomain,WIFI::mServerPort,Communicate::mToServerLinkCheckPack,15);
-	mToServerConnectionHealth=0;//标志正在检测
+	Communicate::SendBytesToServer(mWIFI,WIFI::mServerIPOrDomain,WIFI::mServerPort,Communicate::mToServerPack,15);
+	
 }
 
 
@@ -204,12 +193,14 @@ void APP::HeartBeatRequest()
 ///////////////////////////
 void APP::WaitHeartBeatRequest()
 {
-	mToServerConnectionHealth=0;
 	if(WaitReceiveAndDecode())
 	{
-		if(mBuffer[10]==0&&mBuffer[11]==0&&mBuffer[12]==(TO_SERVER_cAckLinkCheck>>8)&&(mBuffer[13]==(u8)TO_SERVER_cAckLinkCheck))
+		if(mBuffer[10]==0&&mBuffer[11]==2&&mBuffer[12]==(TO_SERVER_cAckLinkCheck>>8)&&(mBuffer[13]==(u8)TO_SERVER_cAckLinkCheck)&&mBuffer[14]==0)
 		{
-			mToServerConnectionHealth=1;//链路正确
+			if(mBuffer[15]==1)
+				mToServerConnectionHealth=1;//链路正确
+			else
+				mToServerConnectionHealth=-1;//链路错误
 		}
 	}
 	if(mToServerConnectionHealth==0)
@@ -290,9 +281,105 @@ bool APP::WaitReceiveAndDecode(unsigned char timeOut)
 				}
 			}
 		}
+		else
+		{
+			FindCar();//闲时，进行车辆扫描
+		}
 	}
 	return false;
 }
 
+void APP::FindCar()
+{
+	if(mRFID.PcdRequest(MFRC522_PICC_REQALL,mTagInfo))//寻到卡
+	{
+		if(((u16)mTagInfo[0]<<8|mTagInfo[1])==MFRC522_PICC_MIFARE_ONE_S50)//卡类型：S50
+		{
+			if(mRFID.PcdAntiColl(mTagInfo))//防冲撞成功(找到一张卡序列号)
+			{
+				mLedGreen.On();
+				
+				mRFID.PcdHalt();
+			}
+			else
+			{
+				mLedGreen.Off();
+			}
+		}
+	}
+	else
+	{
+		mLedGreen.Off();
+	}
+
+}
 
 
+////////////////////////////
+///登录到服务器
+////////////////////////////
+bool APP::LogIn()
+{
+	mToServerLogInStatus=0;//标记正在登录
+	//心跳包数据合成
+	uint16_t temp=Communicate::ToServerGenerateMessageID();
+	Communicate::mToServerPack[2]=temp>>8;//消息ID高字节
+	Communicate::mToServerPack[3]=temp&0x00ff;//消息ID低字节
+	char mac[6]={0,0,0,0,0,0};
+	WIFI::MacAddressStringToBytes((char*)WIFI::mStationMac,mac);  //MAC地址不发送，加密后放在消息体后发送（在mac地址串后面加"A-402"后加密）
+	memcpy(&Communicate::mToServerPack[4],mac,6);//复制mac地址
+
+	//加密
+	/* 这里常数串可以，但是用下面注释了的方式不行，标记为BUG，待查看
+	unsigned char encrypt[23] *//*= "12:08:07:72:07:01A-402"*/; /*
+	unsigned char decrypt[16];
+	memcpy(encrypt,WIFI::mStationMac,16);
+	encrypt[17]='A';
+	encrypt[18]='-';
+	encrypt[19]='4';
+	encrypt[20]='0';
+	encrypt[21]='2';
+	encrypt[21]=0;
+	MD5_CTX md5;
+	MD5Init(&md5);
+	MD5Update(&md5, encrypt, strlen((char *)encrypt));
+	MD5Final(&md5, decrypt);*/
+	
+	unsigned char encrypt[] = "12:08:07:72:07:01A-402";//21232f297a57a5a743894a0e4a801fc3  
+	unsigned char decrypt[16];
+	MD5_CTX md5;
+	MD5Init(&md5);
+	MD5Update(&md5, encrypt, strlen((char *)encrypt));
+	MD5Final(&md5, decrypt);
+	
+	temp=16;//字符串长度（16字节)
+//	if(decrypt[0]==0x64)
+//		mLedRed.On();
+	Communicate::mToServerPack[10]=temp>>8;//消息体长度：高位
+	Communicate::mToServerPack[11]=(uint8_t)temp;//消息体长度：低位
+	Communicate::mToServerPack[12]=TO_SERVER_cReqGateWayLogin>>8;//命令字高字节
+	Communicate::mToServerPack[13]=TO_SERVER_cReqGateWayLogin&0x00ff;//命令字低字节
+	memcpy(&Communicate::mToServerPack[14],decrypt,16);//复制加密后的mac地址
+	Communicate::mToServerPack[14+temp]=MathTool::CheckSum8((unsigned char*)Communicate::mToServerPack,14+temp);
+	
+	Communicate::SendBytesToServer(mWIFI,WIFI::mServerIPOrDomain,WIFI::mServerPort,Communicate::mToServerPack,15+temp);
+	
+	//等待服务器响应（中间会执行RFID扫描）
+	
+	if(WaitReceiveAndDecode())
+	{
+		if(mBuffer[10]==0&&mBuffer[11]==2&&mBuffer[12]==(TO_SERVER_cAckGateWayLogin>>8)&&(mBuffer[13]==(u8)TO_SERVER_cAckGateWayLogin)&&mBuffer[14]==0)
+		{
+			if(mBuffer[15]==1)
+				mToServerLogInStatus=1;//正确
+			else
+				mToServerLogInStatus=-1;//失败
+		}
+	}
+	if(mToServerLogInStatus==0)//登录失败
+		mToServerLogInStatus=-1;
+	if(mToServerLogInStatus==1)
+		return true;
+	else
+		return false;
+}
