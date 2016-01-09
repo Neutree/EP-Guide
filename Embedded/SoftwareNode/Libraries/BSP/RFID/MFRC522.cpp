@@ -514,7 +514,11 @@ bool MFRC522::Kick()
 	temp = ReadRawRC(MFRC522_VersionReg);
 	temp2 = ReadRawRC(MFRC522_VersionReg);
 	if( (!temp&&!temp2) || (temp!=temp2))//两次读到的不相等，即不稳定，或者都为零
+	{	
+		mHealth=false;
 		return false;
+	}
+	mHealth=true;
 	return true;
 }
 

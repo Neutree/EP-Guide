@@ -141,6 +141,12 @@ public:
 	///////////////////////////
 	USART& operator<<(int val);
 	
+	///////////////////////////
+	///@brief print 32bit unsigned integer reload
+	///@param val the integer value that will be print to USART as characters
+	///////////////////////////
+	USART& operator<<(uint32_t val);
+	
 	
 	/////////////////////////////
 	///@brief print double reload

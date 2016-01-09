@@ -15,9 +15,12 @@ APP app;
 ///////////////////////////
 APP::APP()
 :mLedRedGPIO(GPIOB,0,GPIO_Mode_Out_PP,GPIO_Speed_50MHz),mLedGreenGPIO(GPIOB,1,GPIO_Mode_Out_PP,GPIO_Speed_50MHz),
+mBuzzerGPIO(GPIOB,5,GPIO_Mode_Out_PP,GPIO_Speed_50MHz),
 mCOM1(1,115200,true),mCOM2(2,9600,true),
-mLedRed(mLedRedGPIO,false),mLedGreen(mLedGreenGPIO,false),mRFID(&mCOM2)
-	
+mLedRed(mLedRedGPIO,false),mLedGreen(mLedGreenGPIO,false),
+mBuzzer(mBuzzerGPIO,false),
+mRFID(&mCOM2),
+mWIFI(mCOM1,115200)	
 {
 	
 }
@@ -48,6 +51,8 @@ void APP::InitHardware()
 	//PCD复位
 	mRFID.PCDReset();
 	
+	//wifi初始化
+	WIFI::Init(mWIFI);
 	
 	
 	
@@ -71,21 +76,34 @@ void APP::Loop()
 
 
 	//RFID 健康状况,器件存在问题时不会执行--②--
-//	if(!mRFID.mHealth)
-//	{
-//		//一直侦测健康状况
-//		if(mRFID.Kick())//检测到，进行状态设置
-//		{
-//			mRFID.PCDReset();
-//			return;
-//		}
-//		//RFID连接失败处理
-//		
-//			
-//		return;
-//	}
+	if(!mRFID.mHealth)
+	{
+		//一直侦测健康状况
+		if(mRFID.Kick())//检测到，进行状态设置
+		{
+			mRFID.PCDReset();
+			return;
+		}
+		//RFID连接失败处理
+		
+			
+		mBuzzer.On();
+		return;
+	}
+	else
+	{
+		mBuzzer.Off();
+	}
 	//WIFI健康状况检查
-	
+	if(mWIFI.mHealth!=0)//WIFI 存在问题
+	{
+		mBuzzer.On();
+		return ;
+	}
+	else
+	{
+		mBuzzer.Off();
+	}
 /***************************************************************/
 
 	
@@ -110,10 +128,9 @@ if(mRFID.PcdRequest(MFRC522_PICC_REQALL,mTagInfo))//寻到卡
 }
 else
 {
-	mCOM1<<"find fail\n";
 	mLedGreen.Off();
 }
-mCOM1<<"version:"<<mRFID.ReadRawRC(0x37)<<"\n\n";
+
 /***************************************************************/
 	
 	

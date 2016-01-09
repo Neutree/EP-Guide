@@ -26,7 +26,7 @@ MFRC522::MFRC522(USART *usart,GPIO *reset,GPIO *pctrl)
 MFRC522::MFRC522(SPI *spi,GPIO *reset,GPIO *pctrl)
 :mResetPin(*reset),mPctrlPin(*pctrl),mUseSPI(true),mSPI(spi)
 {
-	
+	mHealth=false;
 	
 }
 #endif
@@ -49,6 +49,11 @@ void MFRC522::PCDReset()
 		mResetPin.SetLevel(1);
 		TaskManager::DelayUs(1);
 	}
+	//检测连接情况
+	if(Kick())
+		mHealth=true;//设置状态
+	
+	
 	//向“启动/停止”寄存器写复位命令，即打开模拟电路、打开电源
 	WriteRawRC(MFRC522_CommandReg,MFRC522_PCD_RESETPHASE);
 	TaskManager::DelayUs(1);
@@ -129,9 +134,9 @@ unsigned char MFRC522::ReadRawRC(unsigned char address)
 		mSPI->EnableSPI();
 		address = ((address<<1)&0x7E)|0x80;
 		if(!mSPI->ReadOrWriteByte(address,&temp))
-			return false;
+			return 0;
 		if(!mSPI->ReadOrWriteByte(0,&temp))
-			return false;
+			return 0;
 		mSPI->DisableSPI();
 	}
 #endif
@@ -503,6 +508,19 @@ bool MFRC522::PcdHalt(void)
     return true;
 }
 
+bool MFRC522::Kick()
+{
+	char temp=0,temp2=0;
+	temp = ReadRawRC(MFRC522_VersionReg);
+	temp2 = ReadRawRC(MFRC522_VersionReg);
+	if( (!temp&&!temp2) || (temp!=temp2))//两次读到的不相等，即不稳定，或者都为零
+	{	
+		mHealth=false;
+		return false;
+	}
+	mHealth=true;
+	return true;
+}
 
 /*
 ////////////////////////

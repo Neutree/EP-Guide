@@ -5,7 +5,11 @@
 # include "MFRC522.h"
 # include "GPIO.h"
 # include "LED.h"
+# include "esp8266.h"
+# include "Buzzer.h"
 
+# include "WIFI.h"
+# include "Communicate.h"
 
 class APP
 {
@@ -30,6 +34,7 @@ private:
 	//GPIO
 	GPIO mLedRedGPIO;
 	GPIO mLedGreenGPIO;
+	GPIO mBuzzerGPIO;
 	//串口1
 	USART mCOM1;
 	//串口2
@@ -42,8 +47,12 @@ private:
 	//LED
 	LED mLedRed;
 	LED mLedGreen;
+	///Buzzer
+	Buzzer mBuzzer;
 	//RFID
 	MFRC522 mRFID;
+	//WIFI
+	esp8266 mWIFI;
 /*****************************************************************/
 
 
