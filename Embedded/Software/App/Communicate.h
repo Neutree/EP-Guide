@@ -32,6 +32,11 @@
 #define TO_SERVER_cReqParkSpaceNum      0x0109    //车位数量同步请求
 #define TO_SERVER_cAckParkSpaceNum      0x0809    //车位数量同步响应
 
+
+/**************************对节点*****************************/
+#define To_NODE_cReqStatus              0x0201    //主控向节点请求状态信息
+#define To_NODE_cAckStatus              0x0901    //节点响应主控状态信息请求
+
 class Communicate
 {
 	
@@ -64,7 +69,7 @@ class Communicate
 		///////////////////////
 		///链路请求、响应包
 		//////////////////////
-		static char mToServerPack[50];
+		static char mCommunicatePack[350];
 	
 	
 		/////////////////////////

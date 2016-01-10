@@ -25,6 +25,9 @@ mWIFI(mCOM1,115200)
 	mReqLinkCheckInterval=30;        //心跳包间隔30s
 	mToServerConnectionHealth=-1;    //与服务器的连接初始化为失去连接
 	mToServerLogInStatus=-1;     	//未登录
+	
+	//车位信息初始化
+	mAllNodeInfo.number=0;
 }
 
 
@@ -79,86 +82,81 @@ void APP::InitSoft()
 	
 }
 
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////
 ///循环执行部分
 /////////////////////////////////
 void APP::Loop()
 {	
-/****************--①--器件检测	、状态监测、错误处理**********************/	
-
-
+/****************--①--器件检测	、状态监测、错误处理**********************************/	
+	static bool haveWrong=false;
+	//错误警报
+	if(haveWrong)
+		mBuzzer.On();
+	else
+		mBuzzer.Off();
+	
+	
 	//RFID 健康状况,器件存在问题时不会执行--②--
 	if(!mRFID.mHealth)
 	{
 		//一直侦测健康状况
 		if(mRFID.Kick())//检测到，进行状态设置
-		{
 			mRFID.PCDReset();
-			return;
-		}
 		//RFID连接失败处理
-		
-			
-		mBuzzer.On();
+		haveWrong=true;
 		return;
 	}
-	else
-	{
-		mBuzzer.Off();
-	}
+	
 	
 	//WIFI健康状况检查
 	if(mWIFI.mHealth!=0)//WIFI 存在问题
 	{
 		mBuzzer.On();
 		mWIFI.kick();//检测是否恢复连接
+		haveWrong=true;
 		return ;
 	}
-	else
-	{
-		mBuzzer.Off();
-	}
+	
 	
 	//链路状态检查
 	if(mToServerConnectionHealth==-1)//失去与服务器的连接
 	{
 		HeartBeatRequest();
 		WaitHeartBeatRequestAck();
+		haveWrong=true;
+		return;
 	}
 	
 	//登录状态
 	if(mToServerLogInStatus==-1)//没有登录
 	{
 		//尝试重新登录，如果失败，返回，成功则继续进行下面的动作
-		if(mToServerConnectionHealth==1)//链路正常,尝试登录
-		{
-			LogIn();
-			if(mToServerLogInStatus==-1)//仍然失败
-				return;
-		}
-		else//链路不正常，不用登录
-			return;
-		
+		LogIn();
+		haveWrong=true;
+		return;
 	}
 	
+	haveWrong=false;
+
+/*******************************************************************************/
+
 	
+/****************************--②--车辆检测**************************************/
 
-/***************************************************************/
-
-	
-/*********************--②--车辆检测**************************/
-
-/***************************************************************/
+/*******************************************************************************/
 	FindCar();
 
-/****************--③--接收到的信息处理（取出完整的有效数据帧）**********/
+/*********************--③--接收到的信息处理（取出完整的有效数据帧）***************/
+	
 
-/********************************************************************/
+	
+
+/*******************************************************************************/
 
 
 
-/*************************--⑥--链路保持（心跳包），周期为30秒********************/
+/*************************--④--链路保持（心跳包），周期为30秒********************/
 static uint32_t heartBeatTimeOld=0;
 static uint32_t heartBeatTimeNew=TaskManager::Time();
 
@@ -167,21 +165,38 @@ heartBeatTimeNew=TaskManager::Time();
 if(heartBeatTimeNew-heartBeatTimeOld>=mReqLinkCheckInterval)
 {
 	HeartBeatRequest();
-	WaitHeartBeatRequestAck();
+	WaitHeartBeatRequestAck(); //应弃用，可能会导致阻塞
 	heartBeatTimeOld=heartBeatTimeNew;
 }
 
-//检测来自服务器的链路响应
-
-/********************************************************************/
+/******************************************************************************/
 
 
 
-
-
+/*****************************--⑤--轮询车位节点********************************/
+unsigned char cardId[4];
+unsigned char macAddr[6];
+switch(QueryNodeStatus(cardId,macAddr))//查询节点的信息
+{
+	case NodeStatus_On_line:
+		break;
+	case NodeStatus_OFF_Line:
+		break;
+	case NodeStatus_Busy:
+		break;
+	case NodeStatus_Free:
+		break;
+	case NodeStatus_Disable:
+		break;
+	case NodeStatus_ToBusy:
+		break;
+	case NodeStatus_ToFree:
+		break;
+}
+/******************************************************************************/
 
 }
-
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 void APP::HeartBeatRequest()
@@ -189,19 +204,19 @@ void APP::HeartBeatRequest()
 	mToServerConnectionHealth=0;//标志正在检测
 	//心跳包数据合成
 	uint16_t temp=Communicate::ToServerGenerateMessageID();
-	Communicate::mToServerPack[2]=temp>>8;//消息ID高字节
-	Communicate::mToServerPack[3]=temp&0x00ff;//消息ID低字节
+	Communicate::mCommunicatePack[2]=temp>>8;//消息ID高字节
+	Communicate::mCommunicatePack[3]=temp&0x00ff;//消息ID低字节
 	char mac[6]={1,2,3,4,5,6};
 	WIFI::MacAddressStringToBytes((char*)WIFI::mStationMac,mac);
-	memcpy(&Communicate::mToServerPack[4],mac,6);//复制mac地址
-	Communicate::mToServerPack[10]=0;//消息体长度：0
-	Communicate::mToServerPack[11]=0;//消息体长度：0
-	Communicate::mToServerPack[12]=TO_SERVER_cReqLinkCheck>>8;//命令字高字节
-	Communicate::mToServerPack[13]=TO_SERVER_cReqLinkCheck&0x00ff;//命令字低字节
+	memcpy(&Communicate::mCommunicatePack[4],mac,6);//复制mac地址
+	Communicate::mCommunicatePack[10]=0;//消息体长度：0
+	Communicate::mCommunicatePack[11]=0;//消息体长度：0
+	Communicate::mCommunicatePack[12]=TO_SERVER_cReqLinkCheck>>8;//命令字高字节
+	Communicate::mCommunicatePack[13]=TO_SERVER_cReqLinkCheck&0x00ff;//命令字低字节
 	
-	Communicate::mToServerPack[14]=MathTool::CheckSum8((unsigned char*)Communicate::mToServerPack,14);
+	Communicate::mCommunicatePack[14]=MathTool::CheckSum8((unsigned char*)Communicate::mCommunicatePack,14);
 	
-	Communicate::SendBytesToServer(mWIFI,WIFI::mServerIPOrDomain,WIFI::mServerPort,Communicate::mToServerPack,15);
+	Communicate::SendBytesToServer(mWIFI,WIFI::mServerIPOrDomain,WIFI::mServerPort,Communicate::mCommunicatePack,15);
 	
 }
 
@@ -341,11 +356,11 @@ bool APP::LogIn()
 	mToServerLogInStatus=0;//标记正在登录
 	//心跳包数据合成
 	uint16_t temp=Communicate::ToServerGenerateMessageID();
-	Communicate::mToServerPack[2]=temp>>8;//消息ID高字节
-	Communicate::mToServerPack[3]=temp&0x00ff;//消息ID低字节
+	Communicate::mCommunicatePack[2]=temp>>8;//消息ID高字节
+	Communicate::mCommunicatePack[3]=temp&0x00ff;//消息ID低字节
 	char mac[6]={0,0,0,0,0,0};
 	WIFI::MacAddressStringToBytes((char*)WIFI::mStationMac,mac);  //MAC地址不发送，加密后放在消息体后发送（在mac地址串后面加"A-402"后加密）
-	memcpy(&Communicate::mToServerPack[4],mac,6);//复制mac地址
+	memcpy(&Communicate::mCommunicatePack[4],mac,6);//复制mac地址
 
 	//加密
 	/* 这里常数串可以，但是用下面注释了的方式不行，标记为BUG，待查看
@@ -373,14 +388,14 @@ bool APP::LogIn()
 	temp=16;//字符串长度（16字节)
 //	if(decrypt[0]==0x64)
 //		mLedRed.On();
-	Communicate::mToServerPack[10]=temp>>8;//消息体长度：高位
-	Communicate::mToServerPack[11]=(uint8_t)temp;//消息体长度：低位
-	Communicate::mToServerPack[12]=TO_SERVER_cReqGateWayLogin>>8;//命令字高字节
-	Communicate::mToServerPack[13]=TO_SERVER_cReqGateWayLogin&0x00ff;//命令字低字节
-	memcpy(&Communicate::mToServerPack[14],decrypt,16);//复制加密后的mac地址
-	Communicate::mToServerPack[14+temp]=MathTool::CheckSum8((unsigned char*)Communicate::mToServerPack,14+temp);
+	Communicate::mCommunicatePack[10]=temp>>8;//消息体长度：高位
+	Communicate::mCommunicatePack[11]=(uint8_t)temp;//消息体长度：低位
+	Communicate::mCommunicatePack[12]=TO_SERVER_cReqGateWayLogin>>8;//命令字高字节
+	Communicate::mCommunicatePack[13]=TO_SERVER_cReqGateWayLogin&0x00ff;//命令字低字节
+	memcpy(&Communicate::mCommunicatePack[14],decrypt,16);//复制加密后的mac地址
+	Communicate::mCommunicatePack[14+temp]=MathTool::CheckSum8((unsigned char*)Communicate::mCommunicatePack,14+temp);
 	
-	Communicate::SendBytesToServer(mWIFI,WIFI::mServerIPOrDomain,WIFI::mServerPort,Communicate::mToServerPack,15+temp);
+	Communicate::SendBytesToServer(mWIFI,WIFI::mServerIPOrDomain,WIFI::mServerPort,Communicate::mCommunicatePack,15+temp);
 	
 	//等待服务器响应（中间会执行RFID扫描）
 	
@@ -401,3 +416,67 @@ bool APP::LogIn()
 	else
 		return false;
 }
+
+
+
+////////////////////////////////////////
+///轮询节点信息
+///@param 车的编号（RFID卡的编号），车位状态改变时carID有值，进（出）车库的车的编号
+///@param 车位的mac地址
+///@retval 节点状态 
+///////////////////////////////////////
+NodeStatus APP::QueryNodeStatus(unsigned char carID[4],unsigned char macAddress[6])
+{
+	static uint8_t queryNodeCount=0,NodeNumber=0;
+	if(queryNodeCount==0)
+	{
+		//获取连接到主控的节点ip
+		char* ipStr = mWIFI.getJoinedDeviceIP();
+		NodeNumber = WIFI::IPStringsToBytes(ipStr,mIPBuffer);
+	}
+	++queryNodeCount;//计数累加
+	if(NodeNumber<queryNodeCount)//已经遍历每个节点了
+		queryNodeCount=0;
+	else//还没遍历完所有节点
+	{
+		//帧数据合成
+		uint16_t temp=Communicate::ToServerGenerateMessageID();
+		Communicate::mCommunicatePack[2]=temp>>8;//消息ID高字节
+		Communicate::mCommunicatePack[3]=temp&0x00ff;//消息ID低字节
+/*		WIFI::MacAddressStringToBytes((char*)WIFI::mStationMac,mac);  //MAC地址不发送，加密后放在消息体后发送（在mac地址串后面加"A-402"后加密）
+		memcpy(&Communicate::mCommunicatePack[4],mac,6);//复制mac地址
+*/
+		
+		Communicate::mCommunicatePack[10]=0;//消息体长度：高位
+		Communicate::mCommunicatePack[11]=0;//消息体长度：低位
+		Communicate::mCommunicatePack[12]=To_NODE_cReqStatus>>8;//命令字高字节
+		Communicate::mCommunicatePack[13]=To_NODE_cReqStatus&0x00ff;//命令字低字节
+		Communicate::mCommunicatePack[14]=MathTool::CheckSum8((unsigned char*)Communicate::mCommunicatePack,14);
+		char ip_[16];
+		WIFI::IPBytesToString(mIPBuffer[queryNodeCount-1],ip_);
+		Communicate::SendBytesToServer(mWIFI,(char*)ip_,WIFI::mNodePort,Communicate::mCommunicatePack,15);
+		
+		//等待服务器响应（中间会执行RFID扫描）
+		
+		if(WaitReceiveAndDecode())
+		{
+			/*if(mBuffer[10]==0&&mBuffer[11]==2&&mBuffer[12]==(TO_SERVER_cAckGateWayLogin>>8)&&(mBuffer[13]==(u8)TO_SERVER_cAckGateWayLogin)&&mBuffer[14]==0)
+			{
+				
+			}*/
+			if(mBuffer[10]==0&&mBuffer[11]==1&&mBuffer[12]==(To_NODE_cAckStatus>>8)&&(mBuffer[13]==(u8)To_NODE_cAckStatus))
+				return (NodeStatus)mBuffer[14];
+		}
+		else
+		{
+			return NodeStatus_OFF_Line;
+		}
+	}
+	
+	return NodeStatus_On_line;
+}
+
+
+
+
+

@@ -3,7 +3,7 @@
 
 /**************************–≠“È**********************************/
 
-char Communicate::mToServerPack[50]={0xA4,0x02,};
+char Communicate::mCommunicatePack[350]={0xA4,0x02,};
 
 		
 

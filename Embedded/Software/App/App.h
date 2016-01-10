@@ -15,6 +15,35 @@
 #include "MD5.h"
 
 #define APP_BUFFER_SIZE 50
+#define APP_MAX_PARKING_SPACE_SIZE 50      //最多同时50个车位
+#define APP_MAX_IP_ADDRESS_BUFFER_SIZE 200 //最多50个车位，每个4个字节的IP地址
+
+typedef enum
+{
+	NodeStatus_OFF_Line = 0x80, //掉线
+	NodeStatus_On_line  = 0x40, //在线
+	NodeStatus_Busy     = 0x20, //有车
+	NodeStatus_Free     = 0x10, //空闲
+	NodeStatus_Disable  = 0x08, //不使用该车位
+	
+	NodeStatus_ToBusy   = 0x04, //状态改变,从空闲到有车
+	NodeStatus_ToFree   = 0x02  //从有车到空闲
+}NodeStatus;
+
+typedef struct 
+{
+	unsigned char macAdress[6];
+	unsigned char ipAddress[4];
+	NodeStatus status;
+}NodeInfo;
+
+
+typedef struct 
+{
+	uint16_t number;//车位数量
+	NodeInfo nodeInfo[APP_MAX_PARKING_SPACE_SIZE];//车位状态
+}AllNodeInfo;
+
 
 class APP
 {
@@ -28,6 +57,7 @@ public:
 ///////////////////////////
 	APP();
 
+/**********************************与服务器交互**************************************/
 ///////////////////////////
 ///向服务器发送链路请求（心跳，定时进行）
 ///////////////////////////
@@ -48,6 +78,20 @@ bool WaitReceiveAndDecode(unsigned char timeOut=2);
 bool LogIn();
 
 void FindCar();
+/***********************************************************************************/
+
+
+
+/**********************************与节点交互***************************************/
+////////////////////////////////////////
+///轮询节点信息
+///@param 车的编号（RFID卡的编号），车位状态改变时carID有值，进（出）车库的车的编号
+///@param 车位的mac地址
+///@retval 节点状态 
+///////////////////////////////////////
+NodeStatus QueryNodeStatus(unsigned char carID[4],unsigned char macAddress[6]);
+
+/************************************************************************************/
 
 private:
 /**************************硬件资源*******************************/
@@ -97,6 +141,13 @@ uint16_t mReqLinkCheckInterval; //心跳包间隔定义 单位：S
 int8_t mToServerConnectionHealth; //标志与服务器的连接情况，由链路请求（心跳）控制 1:健康 -1：失去连接 0：正在检测
 int8_t mToServerLogInStatus; //标志与服务器的连接情况，由链路请求（心跳）控制 1:已经登录 -1：未登录 0：正在登录
 unsigned char mBuffer[APP_BUFFER_SIZE];
+//unsigned char mBufferReceive[APP_BUFFER_SIZE];//用来接收数据的缓冲区
+
+//wifi客户端信息（IP地址保存）
+unsigned char mIPBuffer[APP_MAX_PARKING_SPACE_SIZE][4];
+
+//车位信息
+AllNodeInfo mAllNodeInfo;
 /*******************************************************************/
 
 
