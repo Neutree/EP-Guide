@@ -36,7 +36,7 @@ void HeartBeatRequest();
 ///////////////////////////
 ///向服务器发送链路请求（心跳，定时进行）
 ///////////////////////////
-void WaitHeartBeatRequest();
+void WaitHeartBeatRequestAck();
 //////////////////////////
 ///超时等待信息到来，收到的信息将有效信息存到mBuffer开头
 /////////////////////////

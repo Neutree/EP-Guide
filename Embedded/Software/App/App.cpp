@@ -107,10 +107,12 @@ void APP::Loop()
 	{
 		mBuzzer.Off();
 	}
+	
 	//WIFI健康状况检查
 	if(mWIFI.mHealth!=0)//WIFI 存在问题
 	{
 		mBuzzer.On();
+		mWIFI.kick();//检测是否恢复连接
 		return ;
 	}
 	else
@@ -118,10 +120,30 @@ void APP::Loop()
 		mBuzzer.Off();
 	}
 	
+	//链路状态检查
+	if(mToServerConnectionHealth==-1)//失去与服务器的连接
+	{
+		HeartBeatRequest();
+		WaitHeartBeatRequestAck();
+	}
+	
+	//登录状态
 	if(mToServerLogInStatus==-1)//没有登录
 	{
+		//尝试重新登录，如果失败，返回，成功则继续进行下面的动作
+		if(mToServerConnectionHealth==1)//链路正常,尝试登录
+		{
+			LogIn();
+			if(mToServerLogInStatus==-1)//仍然失败
+				return;
+		}
+		else//链路不正常，不用登录
+			return;
 		
 	}
+	
+	
+
 /***************************************************************/
 
 	
@@ -136,7 +158,7 @@ void APP::Loop()
 
 
 
-/*************************--⑥--链路保持（心跳包），周期为10秒********************/
+/*************************--⑥--链路保持（心跳包），周期为30秒********************/
 static uint32_t heartBeatTimeOld=0;
 static uint32_t heartBeatTimeNew=TaskManager::Time();
 
@@ -145,12 +167,8 @@ heartBeatTimeNew=TaskManager::Time();
 if(heartBeatTimeNew-heartBeatTimeOld>=mReqLinkCheckInterval)
 {
 	HeartBeatRequest();
-	WaitHeartBeatRequest();
+	WaitHeartBeatRequestAck();
 	heartBeatTimeOld=heartBeatTimeNew;
-}
-if(mToServerConnectionHealth==-1)//失去与服务器的连接
-{
-	
 }
 
 //检测来自服务器的链路响应
@@ -191,7 +209,7 @@ void APP::HeartBeatRequest()
 ///////////////////////////
 ///向服务器发送链路请求（心跳，定时进行）
 ///////////////////////////
-void APP::WaitHeartBeatRequest()
+void APP::WaitHeartBeatRequestAck()
 {
 	if(WaitReceiveAndDecode())
 	{
