@@ -18,7 +18,7 @@ char WIFI::mJoinApPassword[20]="morenimei0";
 unsigned char WIFI::mStationMac[18]="12:08:07:72:07:01";
 
 //server
-char WIFI::mServerIPOrDomain[30]="192.168.191.1";
+char WIFI::mServerIPOrDomain[30]="192.168.191.6";
 uint32_t WIFI::mServerPort=5080;
 	
 /********************************************************/
@@ -65,5 +65,74 @@ void WIFI::MacAddressStringToBytes(char* macStr, char macAddress[6])
 		++j;
 	}
 }
+
+
+///////////////////////////////
+///将IP字符串转换为数组
+///@param IPStr 字符串
+///@param IP 存放字节类型的IP地址的数组
+///@retval 有效IP地址字符串的长度
+///////////////////////////////
+unsigned char WIFI::IPStringToBytes(char* IPStr, unsigned char IP[4])
+{
+	char i = 0;
+	char j = 0;
+	char k = 0;
+	unsigned char length=0;
+	IP[0] = 0;
+	IP[1] = 0;
+	IP[2] = 0;
+	IP[3] = 0;
+	while (((IPStr[i] >= '0'&&IPStr[i] <= '9')||IPStr[i]=='.')&&j<4)
+	{
+		if (IPStr[i] == '.')
+		{
+			++j;
+			k = 0;
+			++i;
+			++length;
+			continue;
+		}
+		if (k != 0)
+			IP[j] *= 10;
+		IP[j] += (IPStr[i] - '0');
+		++length;
+		++k;
+		++i;
+		if (k > 3)//字符串格式错误
+			return 0;
+	}
+	if (i < 8)
+		return 0;
+	return length;
+
+}
+
+//////////////////////////////////////////
+///提取包含多个IP地址的字符串中的IP地址到数组，每个IP4个字节
+///@param IPStr 字符串
+///@param IP 存放字节类型的IP地址的数组
+///@retval 找到正确格式IP的个数
+/////////////////////////////////////////
+unsigned char WIFI::IPStringsToBytes(char* IPStr, unsigned char IP[][4])
+{
+	short i=0,j=0;
+	char* pStr = IPStr;
+	unsigned char ipStrlength=0;
+	while (IPStr[i] != '\0')
+	{
+		ipStrlength = IPStringToBytes(pStr, IP[j]);
+		if (ipStrlength!=0)
+		{
+			++j;
+			pStr += ipStrlength;
+		}
+		++pStr;
+		++i;
+	}
+	return j;
+}
+
+
 /**********************************************************************/
 
