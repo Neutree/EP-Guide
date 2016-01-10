@@ -30,7 +30,8 @@ public:
 	static char mServerIPOrDomain[30];
 	static uint32_t mServerPort;
 	
-	
+	//Node
+	static uint32_t mNodePort;
 	
 public:
 	/****************WIFI相关工具******************************/
@@ -57,6 +58,14 @@ public:
 	/////////////////////////////////////////
 	static unsigned char IPStringsToBytes(char* IPStr, unsigned char IP[][4]);
 	
+	///////////////////////////////
+	///将IP字符串转换为数组
+	///@param IPStr 字符串
+	///@param IP 存放字节类型的IP地址的数组
+	///@retval 有效IP地址字符串的长度
+	///////////////////////////////
+	static void IPBytesToString( unsigned char IP[4],char* IPStr);
+
 };
 
 

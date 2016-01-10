@@ -20,6 +20,10 @@ unsigned char WIFI::mStationMac[18]="12:08:07:72:07:01";
 //server
 char WIFI::mServerIPOrDomain[30]="192.168.191.6";
 uint32_t WIFI::mServerPort=5080;
+
+
+//node
+uint32_t WIFI::mNodePort=345;
 	
 /********************************************************/
 
@@ -133,6 +137,34 @@ unsigned char WIFI::IPStringsToBytes(char* IPStr, unsigned char IP[][4])
 	return j;
 }
 
+
+
+///////////////////////////////
+///将IP字符串转换为数组
+///@param IPStr 字符串
+///@param IP 存放字节类型的IP地址的数组
+///@retval 有效IP地址字符串的长度
+///////////////////////////////
+void WIFI::IPBytesToString( unsigned char IP[4],char* IPStr)
+{
+	unsigned short temp;
+	unsigned char length=0;
+	for(char i = 0; i<4; ++i)
+	{
+		temp = IP[i];
+		unsigned char  len = 0, data[3];
+		do
+		{
+			len++;
+			data[3 - len] = temp % 10 + '0';
+			temp = temp / 10;
+		} while (temp);
+		length += len;
+		memcpy(IPStr+length-len+i,data + 3 - len, len);
+		IPStr[length+i] = '.';
+	}
+	IPStr[length + 3] = '\0';
+}
 
 /**********************************************************************/
 
