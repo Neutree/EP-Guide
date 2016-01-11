@@ -45,6 +45,14 @@ class LED
 		void Blink2(LED &led,uint8_t time,uint16_t interval);
 		
 		
+		////////////////////////
+		///两个灯交替闪烁n次
+		///@param 另一个灯的引用
+		///@param time 闪烁次数
+		///@param Interval 闪烁间隔(ms)
+		///////////////////////
+		void Blink3(LED &led,uint8_t time,uint16_t interval);
+		
 	private:
 		//////////////////////////
 		///GPIO的类的实例对象引用

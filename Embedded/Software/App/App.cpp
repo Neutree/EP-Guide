@@ -61,15 +61,7 @@ void APP::InitHardware()
 	
 	
 	mCOM1<<"LOG:Initialize complete\n\n\n";
-	for(u8 i=0;i<8;++i)
-	{
-		mLedGreen.On();
-		mLedRed.Off();
-		TaskManager::DelayMs(100);
-		mLedGreen.Off();
-		mLedRed.On();
-		TaskManager::DelayMs(100);
-	}
+	mLedRed.Blink3(mLedGreen,8,100);
 	mLedRed.Off();
 	mCOM1.ClearReceiveBuffer();
 }

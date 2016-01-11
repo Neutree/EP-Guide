@@ -76,4 +76,23 @@ void LED::Blink2(LED &led,uint8_t time,uint16_t interval)
 	}
 }
 
+////////////////////////
+///两个灯交替闪烁n次
+///@param 另一个灯的引用
+///@param time 闪烁次数
+///@param Interval 闪烁间隔(ms)
+///////////////////////
+void LED::Blink3(LED &led,uint8_t time,uint16_t interval)
+{
+	for(uint8_t i=0;i<time;++i)
+	{
+		On();
+		led.Off();
+		TaskManager::DelayMs(interval);
+		Off();
+		led.On();
+		TaskManager::DelayMs(interval);
+	}
+	led.Off();
+}
 
