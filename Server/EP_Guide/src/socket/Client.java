@@ -21,19 +21,26 @@ public class Client {
 			PrintWriter pw = new PrintWriter(os);// 将输出流包装为打印流
 			BufferedReader br = null;
 			InputStream is = null;
-			while (socket.isClosed()) {
-				String heartbeat = "1000";
-				pw.write(heartbeat);
-				pw.flush();
-				System.out.println("已发数据");
-				socket.shutdownOutput();// 关闭输出流
-				// 3.获取输入流，并读取服务器端的响应信息
-				is = socket.getInputStream();
-				br = new BufferedReader(new InputStreamReader(is));
-				String info = null;
-				while ((info = br.readLine()) != null) {// 循环读取server的信息
-					System.out.println("Ack：" + info);
-				}
+			byte[] buf = { (byte) 0xA4, 0x02,
+					0x00, 0x01,
+					0x02,0x02,0x02,0x02,0x02,0x02,
+					0x00,0x02,
+					0x01,0x01,
+					0x00,0x00,
+					0x00
+				};
+			String heartbeat = "1000";
+			
+			os.write(buf);
+			os.flush();
+			System.out.println("已发数据");
+			socket.shutdownOutput();// 关闭输出流
+			// 3.获取输入流，并读取服务器端的响应信息
+			is = socket.getInputStream();
+			br = new BufferedReader(new InputStreamReader(is));
+			String info = null;
+			while ((info = br.readLine()) != null) {// 循环读取server的信息
+				System.out.println("Ack：" + info);
 			}
 
 			// 4.关闭资源

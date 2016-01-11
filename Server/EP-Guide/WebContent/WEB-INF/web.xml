@@ -12,7 +12,7 @@
   
   <servlet>
     <servlet-name>HandleLogin</servlet-name>
-    <servlet-class>control.Login</servlet-class>
+    <servlet-class>client.Login</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>HandleLogin</servlet-name>
@@ -21,7 +21,7 @@
   
   <servlet>
     <servlet-name>HandleLogout</servlet-name>
-    <servlet-class>control.Logout</servlet-class>
+    <servlet-class>client.Logout</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>HandleLogout</servlet-name>
@@ -30,7 +30,7 @@
 
   <servlet>
     <servlet-name>HandleTokenLogin</servlet-name>
-    <servlet-class>control.TokenLogin</servlet-class>
+    <servlet-class>client.TokenLogin</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>HandleTokenLogin</servlet-name>
@@ -39,7 +39,7 @@
   
   <servlet>
     <servlet-name>HandleOrderParkSpace</servlet-name>
-    <servlet-class>control.OrderParkSpace</servlet-class>
+    <servlet-class>client.OrderParkSpace</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>HandleOrderParkSpace</servlet-name>
@@ -48,7 +48,7 @@
   
   <servlet>
     <servlet-name>HandleQueryParkSpaces</servlet-name>
-    <servlet-class>control.QueryParkSpaces</servlet-class>
+    <servlet-class>client.QueryParkSpaces</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>HandleQueryParkSpaces</servlet-name>
@@ -57,7 +57,7 @@
   
   <servlet>
     <servlet-name>HandleQueryParkHistory</servlet-name>
-    <servlet-class>control.QueryParkHistory</servlet-class>
+    <servlet-class>client.QueryParkHistory</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>HandleQueryParkHistory</servlet-name>
@@ -66,7 +66,7 @@
   
   <servlet>
     <servlet-name>HandleHeartBeat</servlet-name>
-    <servlet-class>control.HeartBeat</servlet-class>
+    <servlet-class>client.HeartBeat</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>HandleHeartBeat</servlet-name>

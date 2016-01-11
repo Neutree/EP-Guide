@@ -20,17 +20,17 @@ public class ServerThead extends Thread {
 	protected OutputStream os = null;
 	protected PrintWriter pw = null;
 	protected String recvData = null;
-	protected String backMsg="welcome";
-	
+	protected String backMsg = "welcome";
+
 	public ServerThead(Socket socket) {
 		this.socket = socket;
 	}
 
 	// 线程执行的操作，响应客户端的请求
 	public void run() {
-		read();//读取数据
-		deal();//处理数据
-		write();//写入需响应的数据
+		read();// 读取数据
+		deal();// 处理数据
+		write();// 写入需响应的数据
 		close();// 关闭资源
 	}
 
@@ -40,21 +40,31 @@ public class ServerThead extends Thread {
 			is = socket.getInputStream();
 			isr = new InputStreamReader(is);
 			br = new BufferedReader(isr);
-			while ((recvData = br.readLine()) != null) {// 循环读取客户端的信息
-				System.out.println("Info ， Socket receive :" + recvData);
+
+			String temp = null;
+			boolean flag = true;
+			while ((temp = br.readLine()) != null) {// 循环读取客户端的信息
+				System.out.println("temp : " + temp);
+				if (flag) {
+					recvData = temp;
+					flag = false;
+				} else {
+					recvData += temp;
+				}
 			}
+			System.out.println("Info ， Socket receive :" + recvData);
 			socket.shutdownInput();// 关闭输入流
 		} catch (Exception e) {
 			System.out.println("Info , Socket : 读取socket信息异常 ：");
 			e.printStackTrace();
 		}
-		
+
 	}
 
-	public void deal(){
-		
+	public void deal() {
+
 	}
-	
+
 	protected void write() {
 		try {
 			// 获取输出流,响应客户端请求
@@ -67,7 +77,7 @@ public class ServerThead extends Thread {
 			System.out.println("Abnormal , Socket : 写入数据异常 ：");
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	protected void close() {

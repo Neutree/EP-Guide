@@ -89,8 +89,10 @@ public class QueryParkHistory extends HttpServlet {
 		}
 		// 2.4 查询对应car_ID的停车记录
 		List<ParkHistory> hList = DBOpreate.queryHistory(car_ID);
-		System.out.println("list: " + hList.toString());
-		if (hList.size() > 0) {
+		//System.out.println("list: " + hList.toString());
+		if (hList==null) {
+			result = ConstantCode.Res_Fail_HistoryParkQuery;
+		}else if (hList.size()>0) {
 			result = ConstantCode.Res_HistoryParkQuery;
 		}
 		// -- 把需返回的参数转换成json格式 --//
