@@ -2,6 +2,7 @@ package deal;
 
 import bean.Message;
 import constant.ConstantCode;
+import dao.DeleteNode;
 import tool.AndVerify;
 import tool.DataTransform;
 
@@ -13,7 +14,7 @@ public class NodeDelete {
 	 * @return
 	 */
 	public static byte[] delete(Message msgBean) {
-		byte[] bMsgBody = ConstantCode.Succeed;// 获取要返回的消息体内容
+		byte[] bMsgBody = DeleteNode.delete(msgBean.getbMsgBody());// 获取要返回的消息体内容
 		byte[] gMsgLen = DataTransform.intToByteGroup(bMsgBody.length, 2);// 消息体长度
 
 		msgBean.setbMsgCmd(DataTransform.intToByteGroup(ConstantCode.cAckLinkCheck, 2));
