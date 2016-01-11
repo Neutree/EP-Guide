@@ -39,6 +39,7 @@ public class ServerThead extends Thread {
 		System.out.println("backMsg:");
 		OutputByteGrp.output(backMsg);
 		write(backMsg);// 写入需响应的数据
+		
 		try {
 			sleep(5000);
 		} catch (InterruptedException e) {
@@ -47,26 +48,7 @@ public class ServerThead extends Thread {
 		}
 		close();// 关闭资源
 		System.out.println("socket已关闭");
-		/*
-		while (true) {
-			 try {
-				sleep(1000);
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			 try {
-				socket.sendUrgentData(0xFF);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				close();// 关闭资源
-				System.out.println("socket已关闭");
-				break;
-			}
-			
-		}
-		*/
+		
 	}
 
 	protected void readByte() {

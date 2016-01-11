@@ -14,9 +14,10 @@ public class ServerHost {
 	public static void main(String[] args) {
 		try {
 			// 1.创建一个服务器端Socket,即ServerSocket,指定绑定的端口，并监听此端口
+			@SuppressWarnings("resource")
 			ServerSocket serverSocket = new ServerSocket(5080);
 			Socket socket = null;
-
+			
 			// 2.调用accept()方法开始监听，等待客户端的连接
 			System.out.println("Server Started，waiting for connect ：");
 			while (true) {// 循环监听等待客户端的连接

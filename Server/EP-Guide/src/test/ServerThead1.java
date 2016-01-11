@@ -8,7 +8,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import database.DBOpreate;
+import dao.DBOpreate;
 
 public class ServerThead1 extends Thread {
 	/*

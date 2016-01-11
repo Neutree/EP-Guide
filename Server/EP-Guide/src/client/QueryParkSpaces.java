@@ -13,8 +13,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import bean.ParkSpace;
-import config.ConstantCode;
-import database.DBOpreate;
+import constant.ConstantCode;
+import dao.DBOpreate;
 import net.sf.json.JSONArray;
 
 public class QueryParkSpaces extends HttpServlet {
