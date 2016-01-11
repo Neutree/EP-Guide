@@ -176,23 +176,32 @@ if(heartBeatTimeNew-heartBeatTimeOld>=mReqLinkCheckInterval)
 /*****************************--⑤--轮询车位节点********************************/
 unsigned char cardId[4];
 unsigned char macAddr[6];
-switch(QueryNodeStatus(cardId,macAddr))//查询节点的信息
+NodeStatus status = QueryNodeStatus(cardId,macAddr);//包含掉线检查
+if(status&NodeStatus_On_line)//在线
 {
-	case NodeStatus_On_line:
-		break;
-	case NodeStatus_OFF_Line:
-		break;
-	case NodeStatus_Busy:
-		break;
-	case NodeStatus_Free:
-		break;
-	case NodeStatus_Disable:
-		break;
-	case NodeStatus_ToBusy:
-		break;
-	case NodeStatus_ToFree:
-		break;
+	if(RoleStatus(macAddr)==0)//新的节点，发送新的节点请求
+	{
+		
+	}
+	else//不是新节点
+	{
+		if(status & (NodeStatus_ToFree|NodeStatus_ToBusy))//车位状态更改,向服务器发送状态 更改请求
+		{
+			ReqChangeStatus(macAddr,(NodeStatus)(status&(NodeStatus_ToFree|NodeStatus_ToBusy)),cardId);
+		}
+		else if(status&NodeStatus_Free)//车位状态依然为空闲
+		{
+			
+		}
+		else if(status&NodeStatus_Busy)//车位状态依然为忙
+		{
+			
+		}
+	}
 }
+
+
+
 /******************************************************************************/
 
 }
@@ -354,7 +363,7 @@ void APP::FindCar()
 bool APP::LogIn()
 {
 	mToServerLogInStatus=0;//标记正在登录
-	//心跳包数据合成
+	//帧数据合成
 	uint16_t temp=Communicate::ToServerGenerateMessageID();
 	Communicate::mCommunicatePack[2]=temp>>8;//消息ID高字节
 	Communicate::mCommunicatePack[3]=temp&0x00ff;//消息ID低字节
@@ -419,6 +428,140 @@ bool APP::LogIn()
 
 
 
+
+///////////////////////////
+///发送车位状态更改请求
+///@param macAddress mac地址
+///@param status 状态更改  取值:    NodeStatus_ToBusy   = 0x04, //状态改变,从空闲到有车
+///                                 NodeStatus_ToFree   = 0x02  //从有车到空闲
+///@param carID 车主ID
+///@retval 请求是否成功
+///////////////////////////
+bool APP::ReqChangeStatus(unsigned char macAddress[6],NodeStatus status,unsigned char carID[4])
+{
+	//帧数据合成
+	uint16_t temp=Communicate::ToServerGenerateMessageID();
+	Communicate::mCommunicatePack[2]=temp>>8;//消息ID高字节
+	Communicate::mCommunicatePack[3]=temp&0x00ff;//消息ID低字节
+	char mac[6]={0,0,0,0,0,0};
+	WIFI::MacAddressStringToBytes((char*)WIFI::mStationMac,mac);
+	memcpy(&Communicate::mCommunicatePack[4],mac,6);//复制主控mac地址
+	Communicate::mCommunicatePack[10]=0;//消息体长度高位：0
+	Communicate::mCommunicatePack[11]=12;//消息体长度低位：0
+	Communicate::mCommunicatePack[12]=TO_SERVER_cReqNodeStatusUpdate>>8;//命令字高字节
+	Communicate::mCommunicatePack[13]=TO_SERVER_cReqNodeStatusUpdate&0x00ff;//命令字低字节
+	memcpy(&Communicate::mCommunicatePack[14],macAddress,6);//复制节点mac地址
+	Communicate::mCommunicatePack[20]=0;//车位状态高位
+	if(status&NodeStatus_ToBusy)
+		Communicate::mCommunicatePack[21]=1;//车位状态低位，车位变成忙
+	else if(status&NodeStatus_ToFree)
+		Communicate::mCommunicatePack[21]=0;//车位变成空闲
+	else //不是状态更改，错误
+		return false;
+	memcpy(&Communicate::mCommunicatePack[22],carID,4);//复制车主ID号
+	Communicate::mCommunicatePack[26]=MathTool::CheckSum8((unsigned char*)Communicate::mCommunicatePack,26);
+	//发送到服务器
+	Communicate::SendBytesToServer(mWIFI,WIFI::mServerIPOrDomain,WIFI::mServerPort,Communicate::mCommunicatePack,27);
+	//获取响应
+	if(WaitReceiveAndDecode())
+	{
+		if(mBuffer[10]==0&&mBuffer[11]==2&&mBuffer[12]==(TO_SERVER_cAckNodeStatusUpdate>>8)&&(mBuffer[13]==(u8)TO_SERVER_cAckNodeStatusUpdate)&&mBuffer[14]==0)
+		{
+			if(mBuffer[15]==1)
+				return true;
+			else
+				return false;
+		}
+	}
+	return false;
+}
+
+
+
+///////////////////////////
+///请求添加新的节点
+///@param macAddress 新节点的mac地址
+///@retval 是否成功
+///////////////////////////
+bool APP::ReqAddNewNode(unsigned char macAddress[6])
+{
+	//帧数据合成
+	uint16_t temp=Communicate::ToServerGenerateMessageID();
+	Communicate::mCommunicatePack[2]=temp>>8;//消息ID高字节
+	Communicate::mCommunicatePack[3]=temp&0x00ff;//消息ID低字节
+	char mac[6]={0,0,0,0,0,0};
+	WIFI::MacAddressStringToBytes((char*)WIFI::mStationMac,mac);
+	memcpy(&Communicate::mCommunicatePack[4],mac,6);//复制主控mac地址
+	Communicate::mCommunicatePack[10]=0;//消息体长度高位：0
+	Communicate::mCommunicatePack[11]=8;//消息体长度低位：0
+	Communicate::mCommunicatePack[12]=TO_SERVER_cReqAddNode>>8;//命令字高字节
+	Communicate::mCommunicatePack[13]=TO_SERVER_cReqAddNode&0x00ff;//命令字低字节
+	Communicate::mCommunicatePack[14]=0;
+	Communicate::mCommunicatePack[15]=1;
+	memcpy(&Communicate::mCommunicatePack[16],macAddress,6);//复制节点mac地址
+	Communicate::mCommunicatePack[22]=MathTool::CheckSum8((unsigned char*)Communicate::mCommunicatePack,22);
+	//发送到服务器
+	Communicate::SendBytesToServer(mWIFI,WIFI::mServerIPOrDomain,WIFI::mServerPort,Communicate::mCommunicatePack,23);
+	//获取响应
+	if(WaitReceiveAndDecode())
+	{
+		if(mBuffer[10]==0&&mBuffer[11]==4&&mBuffer[12]==(TO_SERVER_cAckAddNode>>8)&&(mBuffer[13]==(u8)TO_SERVER_cAckAddNode)&&mBuffer[14]==0)
+		{
+			if(mBuffer[15]==1)
+			{
+				if(mBuffer[16]==0&&mBuffer[17]==0)//设置节点状态为空闲
+				{
+				}
+				else//设置节点为忙
+				{
+					
+				}
+				return true;
+			}
+			else
+				return false;
+		}
+	}
+	return false;
+}
+
+
+///////////////////////////
+///请求删除节点
+///@param macAddress 新节点的mac地址
+///@retval 是否成功
+///////////////////////////
+bool APP::ReqDelNode(unsigned char macAddress[6])
+{
+		//帧数据合成
+	uint16_t temp=Communicate::ToServerGenerateMessageID();
+	Communicate::mCommunicatePack[2]=temp>>8;//消息ID高字节
+	Communicate::mCommunicatePack[3]=temp&0x00ff;//消息ID低字节
+	char mac[6]={0,0,0,0,0,0};
+	WIFI::MacAddressStringToBytes((char*)WIFI::mStationMac,mac);
+	memcpy(&Communicate::mCommunicatePack[4],mac,6);//复制主控mac地址
+	Communicate::mCommunicatePack[10]=0;//消息体长度高位：0
+	Communicate::mCommunicatePack[11]=8;//消息体长度低位：0
+	Communicate::mCommunicatePack[12]=TO_SERVER_cReqNodeDel>>8;//命令字高字节
+	Communicate::mCommunicatePack[13]=TO_SERVER_cReqNodeDel&0x00ff;//命令字低字节
+	Communicate::mCommunicatePack[14]=0;
+	Communicate::mCommunicatePack[15]=1;
+	memcpy(&Communicate::mCommunicatePack[16],macAddress,6);//复制节点mac地址
+	Communicate::mCommunicatePack[22]=MathTool::CheckSum8((unsigned char*)Communicate::mCommunicatePack,22);
+	//发送到服务器
+	Communicate::SendBytesToServer(mWIFI,WIFI::mServerIPOrDomain,WIFI::mServerPort,Communicate::mCommunicatePack,23);
+	//获取响应
+	if(WaitReceiveAndDecode())
+	{
+		if(mBuffer[10]==0&&mBuffer[11]==4&&mBuffer[12]==(TO_SERVER_cAckNodeDel>>8)&&(mBuffer[13]==(u8)TO_SERVER_cAckNodeDel)&&mBuffer[14]==0)
+		{
+			if(mBuffer[15]==1)//删除成功
+				return true;
+		}
+	}
+	return false;
+}
+
 ////////////////////////////////////////
 ///轮询节点信息
 ///@param 车的编号（RFID卡的编号），车位状态改变时carID有值，进（出）车库的车的编号
@@ -430,13 +573,37 @@ NodeStatus APP::QueryNodeStatus(unsigned char carID[4],unsigned char macAddress[
 	static uint8_t queryNodeCount=0,NodeNumber=0;
 	if(queryNodeCount==0)
 	{
+		//将所有的节点的是否已经询问了的标志复位
+		for(uint16_t i=0;i<mAllNodeInfo.number;++i)
+			mAllNodeInfo.nodeInfo[i].checked=false;
 		//获取连接到主控的节点ip
 		char* ipStr = mWIFI.getJoinedDeviceIP();
 		NodeNumber = WIFI::IPStringsToBytes(ipStr,mIPBuffer);
 	}
 	++queryNodeCount;//计数累加
 	if(NodeNumber<queryNodeCount)//已经遍历每个节点了
+	{
+		//检测是否有节点没有检测到（失去连接了）
+		for(uint16_t i=0;i<mAllNodeInfo.number;++i)
+		{
+			if(mAllNodeInfo.nodeInfo[i].checked==false)//没有检测到的节点,发送删除节点请求，如果失败，则报警，提示错误信息
+			{
+				if(ReqDelNode(mAllNodeInfo.nodeInfo[i].macAdress))//删除节点成功
+				{
+					//删除这个节点的信息
+					for(uint16_t j=i;j<mAllNodeInfo.number;++j)
+					{
+						mAllNodeInfo.nodeInfo[j]=mAllNodeInfo.nodeInfo[j+1];
+					}
+				}
+				else                                              //删除失败
+				{
+					
+				}
+			}
+		}
 		queryNodeCount=0;
+	}
 	else//还没遍历完所有节点
 	{
 		//帧数据合成
@@ -464,8 +631,19 @@ NodeStatus APP::QueryNodeStatus(unsigned char carID[4],unsigned char macAddress[
 			{
 				
 			}*/
-			if(mBuffer[10]==0&&mBuffer[11]==1&&mBuffer[12]==(To_NODE_cAckStatus>>8)&&(mBuffer[13]==(u8)To_NODE_cAckStatus))
+			mAllNodeInfo.nodeInfo[queryNodeCount-1].checked=true;//标志应询问过了
+			if(mBuffer[10]==0&&mBuffer[11]==5&&mBuffer[12]==(To_NODE_cAckStatus>>8)&&(mBuffer[13]==(u8)To_NODE_cAckStatus))
+			{
+				for(uint8_t i=0;i<6;++i)//mac地址
+				{
+					macAddress[i]=mBuffer[i+4];
+				}
+				for(uint8_t i=0;i<4;++i)//车辆ID号
+				{
+					carID[i]=mBuffer[i+15];
+				}
 				return (NodeStatus)mBuffer[14];
+			}
 		}
 		else
 		{
@@ -476,6 +654,42 @@ NodeStatus APP::QueryNodeStatus(unsigned char carID[4],unsigned char macAddress[
 	return NodeStatus_On_line;
 }
 
+
+/////////////////////////////////////////
+///查询节点的MAC地址是否在节点信息中，以及是否被禁用
+///@retval 0:没有该节点信息，是新的节点  1：有该节点的信息，是已经添加了的节点 
+/////////////////////////////////////////
+uint8_t APP::RoleStatus(uint8_t macAddress[6])
+{
+	for(uint8_t i=0;i<mAllNodeInfo.number;++i)
+	{
+		if(memcmp(macAddress,mAllNodeInfo.nodeInfo[i].macAdress,6)==0)//找到节点信息
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+
+
+
+
+
+/////////////////////////////////////////
+///根据mac地址寻找节点的IP地址
+/////////////////////////////////////////
+bool APP::FinIPbyMacAddress(uint8_t macAddress[6],uint8_t ip[4])
+{
+	for(uint8_t i=0;i<mAllNodeInfo.number;++i)
+	{
+		if(memcmp(macAddress,mAllNodeInfo.nodeInfo[i].macAdress,6)==0)//找到节点信息
+		{
+			memcpy(ip,mAllNodeInfo.nodeInfo[i].ipAddress,4);
+			return true;
+		}
+	}
+	return false;
+}
 
 
 

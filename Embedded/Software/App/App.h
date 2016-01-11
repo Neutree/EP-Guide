@@ -35,6 +35,7 @@ typedef struct
 	unsigned char macAdress[6];
 	unsigned char ipAddress[4];
 	NodeStatus status;
+	bool checked;
 }NodeInfo;
 
 
@@ -57,6 +58,8 @@ public:
 ///////////////////////////
 	APP();
 
+
+
 /**********************************与服务器交互**************************************/
 ///////////////////////////
 ///向服务器发送链路请求（心跳，定时进行）
@@ -77,8 +80,43 @@ bool WaitReceiveAndDecode(unsigned char timeOut=2);
 ////////////////////////////
 bool LogIn();
 
+///////////////////////////
+///发送车位状态更改请求
+///@param macAddress mac地址
+///@param status 状态更改  取值:    NodeStatus_ToBusy   = 0x04, //状态改变,从空闲到有车
+///                                 NodeStatus_ToFree   = 0x02  //从有车到空闲
+///@param 车主ID号
+///@retval 请求是否成功
+///////////////////////////
+bool ReqChangeStatus(unsigned char macAddress[6],NodeStatus status,unsigned char carID[4]);
+
+
+///////////////////////////
+///请求添加新的节点
+///@param macAddress 新节点的mac地址
+///@retval 是否成功
+///////////////////////////
+bool ReqAddNewNode(unsigned char macAddress[6]);
+
+///////////////////////////
+///请求删除节点
+///@param macAddress 新节点的mac地址
+///@retval 是否成功
+///////////////////////////
+bool ReqDelNode(unsigned char macAddress[6]);
+	
+/***********************************************************************************/
+
+
+
+
+
+/*************************RFID*******************************************************/
 void FindCar();
 /***********************************************************************************/
+
+
+
 
 
 
@@ -91,6 +129,16 @@ void FindCar();
 ///////////////////////////////////////
 NodeStatus QueryNodeStatus(unsigned char carID[4],unsigned char macAddress[6]);
 
+/////////////////////////////////////////
+///查询节点的MAC地址是否在节点信息中，以及是否被禁用
+///@retval 0:没有该节点信息，是新的节点  1：有该节点的信息，是已经添加了的节点 
+/////////////////////////////////////////
+uint8_t RoleStatus(uint8_t macAddress[6]);
+
+/////////////////////////////////////////
+///根据mac地址寻找节点的IP地址
+/////////////////////////////////////////
+bool FinIPbyMacAddress(uint8_t macAddress[6],uint8_t ip[4]);
 /************************************************************************************/
 
 private:
