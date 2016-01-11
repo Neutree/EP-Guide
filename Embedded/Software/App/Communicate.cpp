@@ -1,14 +1,14 @@
 #include "Communicate.h"
 
 
-/**************************Ğ­Òé**********************************/
+/**************************åè®®**********************************/
 
 char Communicate::mCommunicatePack[350]={0xA4,0x02,};
 
 		
 
 /////////////////////////
-///¼ÇÂ¼ÏûÏ¢IDºÅ£¨µİÔö£©
+///è®°å½•æ¶ˆæ¯IDå·ï¼ˆé€’å¢ï¼‰
 /////////////////////////
 uint16_t Communicate::ToServerGenerateMessageID()
 {
@@ -18,36 +18,36 @@ uint16_t Communicate::ToServerGenerateMessageID()
 
 
 
-/**************************Í¨ĞÅ***************************************/
+/**************************é€šä¿¡***************************************/
 ////////////////////////////
-///·¢ËÍÒ»¸ö×Ö½Úµ½·şÎñÆ÷
-///@param wifi wifi¶ÔÏó
-///@param ipAddress ·şÎñÆ÷IPµØÖ·
-///@param port ·şÎñÆ÷¶Ë¿Ú
-///@param data ĞèÒª·¢ËÍµÄÒ»¸ö×Ö½ÚµÄÊı¾İ
-///@param ÊÇ·ñ·¢ËÍ³É¹¦£¨¶Ô·½²»Ò»¶¨½ÓÊÕµ½£¬Ö»ÊÇ·¢ËÍ³É¹¦£©
+///å‘é€ä¸€ä¸ªå­—èŠ‚åˆ°æœåŠ¡å™¨
+///@param wifi wifiå¯¹è±¡
+///@param ipAddress æœåŠ¡å™¨IPåœ°å€
+///@param port æœåŠ¡å™¨ç«¯å£
+///@param data éœ€è¦å‘é€çš„ä¸€ä¸ªå­—èŠ‚çš„æ•°æ®
+///@param æ˜¯å¦å‘é€æˆåŠŸï¼ˆå¯¹æ–¹ä¸ä¸€å®šæ¥æ”¶åˆ°ï¼Œåªæ˜¯å‘é€æˆåŠŸï¼‰
 ////////////////////////////
 bool Communicate::SendBytesToServer(esp8266 & wifi,char* ipAddress,uint32_t port,char* data,uint32_t len)
 {
-	if(!wifi.createTCPMutipleMode(4,ipAddress,port))//½¨Á¢Á¬½ÓÊ§°Ü£¬¹Ø±Õ4ºÅÁ¬½Ó£¬ÖØĞÂ½¨Á¢£¬Ê§°ÜÔò·µ»ØÊ§°ÜĞÅÏ¢
+	if(!wifi.createTCPMutipleMode(4,ipAddress,port))//å»ºç«‹è¿æ¥å¤±è´¥ï¼Œå…³é—­4å·è¿æ¥ï¼Œé‡æ–°å»ºç«‹ï¼Œå¤±è´¥åˆ™è¿”å›å¤±è´¥ä¿¡æ¯
 	{
 		wifi.CloseMulitpleSend(4);
 		if(!wifi.createTCPMutipleMode(4,ipAddress,port))
 			return false;
 	}
 	wifi.sendMultipleMode(4,data,len);
-	wifi.CloseMulitpleSend(4);
+	//wifi.CloseMulitpleSend(4);   è¿™é‡Œä¸å…³é—­ï¼Œæ”¾åœ¨é€šä¿¡ç»“æŸåå…³é—­
 	return false;
 }
 
 
 //////////////////////////////
-///·¢ËÍhttpÇëÇóµ½·şÎñÆ÷
-///@param wifi wifi¶ÔÏó
-///@param ipAddress ·şÎñÆ÷IPµØÖ·
-///@param port ·şÎñÆ÷¶Ë¿Ú
-///@param data ÇëÇóÄÚÈİ
-///@param ÊÇ·ñ·¢ËÍ³É¹¦£¨¶Ô·½²»Ò»¶¨½ÓÊÕµ½£¬Ö»ÊÇ·¢ËÍ³É¹¦£©
+///å‘é€httpè¯·æ±‚åˆ°æœåŠ¡å™¨
+///@param wifi wifiå¯¹è±¡
+///@param ipAddress æœåŠ¡å™¨IPåœ°å€
+///@param port æœåŠ¡å™¨ç«¯å£
+///@param data è¯·æ±‚å†…å®¹
+///@param æ˜¯å¦å‘é€æˆåŠŸï¼ˆå¯¹æ–¹ä¸ä¸€å®šæ¥æ”¶åˆ°ï¼Œåªæ˜¯å‘é€æˆåŠŸï¼‰
 /////////////////////////////
 bool Communicate::HttpRequest(esp8266 & wifi,char* ipAddress,uint32_t port,char* data)
 {

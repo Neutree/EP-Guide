@@ -22,7 +22,8 @@ mBuzzer(mBuzzerGPIO,false),
 mRFID(&mCOM2),
 mWIFI(mCOM1,115200)	
 {
-	mReqLinkCheckInterval=30;        //心跳包间隔30s
+	mReqLinkCheckInterval=10;        //心跳包间隔30s
+	mLogInFailRetryInterval=5;       //登录失败重试间隔间隔定义 单位：S
 	mToServerConnectionHealth=-1;    //与服务器的连接初始化为失去连接
 	mToServerLogInStatus=-1;     	//未登录
 	
@@ -58,8 +59,8 @@ void APP::InitHardware()
 	WIFI::Init(mWIFI);
 	
 	
-	mCOM1<<"Initialize complete\n\n\n";
-	for(u8 i=0;i<10;++i)
+	mCOM1<<"LOG:Initialize complete\n\n\n";
+	for(u8 i=0;i<8;++i)
 	{
 		mLedGreen.On();
 		mLedRed.Off();
@@ -79,7 +80,6 @@ void APP::InitSoft()
 {
 	//登录服务器
 	LogIn();
-	
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,6 +100,7 @@ void APP::Loop()
 	//RFID 健康状况,器件存在问题时不会执行--②--
 	if(!mRFID.mHealth)
 	{
+		//mCOM1<<"LOG:RFID fail\n";
 		//一直侦测健康状况
 		if(mRFID.Kick())//检测到，进行状态设置
 			mRFID.PCDReset();
@@ -119,24 +120,35 @@ void APP::Loop()
 	}
 	
 	
+
+	
+	//登录状态
+	if(mToServerLogInStatus==-1)//没有登录
+	{
+		static double timeOld=TaskManager::Time();
+		double timeNew=TaskManager::Time();
+//		mCOM1<<"LOG:not log in\n";
+//		mCOM1<<timeNew<<"\t"<<timeOld<<"\n";
+		if(timeNew-timeOld>=mLogInFailRetryInterval)//登录失败重新登录
+		{
+			timeOld=timeNew;
+			//尝试重新登录，如果失败，返回，成功则继续进行下面的动作
+			LogIn();
+		}		
+		haveWrong=true;
+		return;
+	}
+	
 	//链路状态检查
 	if(mToServerConnectionHealth==-1)//失去与服务器的连接
 	{
+//		mCOM1<<"LOG:connection fail\n";
+		mToServerLogInStatus=-1;//登录标志置位未登录
 		HeartBeatRequest();
 		WaitHeartBeatRequestAck();
 		haveWrong=true;
 		return;
 	}
-	
-	//登录状态
-	if(mToServerLogInStatus==-1)//没有登录
-	{
-		//尝试重新登录，如果失败，返回，成功则继续进行下面的动作
-		LogIn();
-		haveWrong=true;
-		return;
-	}
-	
 	haveWrong=false;
 
 /*******************************************************************************/
@@ -166,6 +178,8 @@ if(heartBeatTimeNew-heartBeatTimeOld>=mReqLinkCheckInterval)
 {
 	HeartBeatRequest();
 	WaitHeartBeatRequestAck(); //应弃用，可能会导致阻塞
+//	if(mToServerConnectionHealth==-1)
+//		mCOM1<<"Connection fail\n";
 	heartBeatTimeOld=heartBeatTimeNew;
 }
 
@@ -174,7 +188,7 @@ if(heartBeatTimeNew-heartBeatTimeOld>=mReqLinkCheckInterval)
 
 
 /*****************************--⑤--轮询车位节点********************************/
-unsigned char cardId[4];
+/*unsigned char cardId[4];
 unsigned char macAddr[6];
 NodeStatus status = QueryNodeStatus(cardId,macAddr);//包含掉线检查
 if(status&NodeStatus_On_line)//在线
@@ -199,7 +213,7 @@ if(status&NodeStatus_On_line)//在线
 		}
 	}
 }
-
+*/
 
 
 /******************************************************************************/
@@ -310,7 +324,9 @@ bool APP::WaitReceiveAndDecode(unsigned char timeOut)
 					
 					if(count2>=length)
 					{
-
+						//关闭通信连接
+						mWIFI.CloseMulitpleSend(4);
+						
 						u16 dataLength=((unsigned short)mBuffer[10])<<8|mBuffer[11];
 						//数据验证有效性
 						if(mBuffer[0]==0xA4&&mBuffer[1]==0x02&&mBuffer[14+dataLength]==MathTool::CheckSum8(mBuffer,dataLength+14))//数据头和校验正确
@@ -328,6 +344,8 @@ bool APP::WaitReceiveAndDecode(unsigned char timeOut)
 			FindCar();//闲时，进行车辆扫描
 		}
 	}
+	//关闭通信连接
+	mWIFI.CloseMulitpleSend(4);
 	return false;
 }
 
@@ -340,7 +358,7 @@ void APP::FindCar()
 			if(mRFID.PcdAntiColl(mTagInfo))//防冲撞成功(找到一张卡序列号)
 			{
 				mLedGreen.On();
-				
+				mCOM1<<"ID:"<<mTagInfo[0]<<"\t"<<mTagInfo[1]<<"\t"<<mTagInfo[2]<<"\t"<<mTagInfo[3]<<"\n";
 				mRFID.PcdHalt();
 			}
 			else
@@ -352,8 +370,9 @@ void APP::FindCar()
 	else
 	{
 		mLedGreen.Off();
+		mCOM1<<"fail\n";
 	}
-
+	mCOM1<<"version:"<<mRFID.ReadRawRC(0x37)<<"\n\n";
 }
 
 
@@ -410,6 +429,8 @@ bool APP::LogIn()
 	
 	if(WaitReceiveAndDecode())
 	{
+		//链路没问题
+		mToServerConnectionHealth=true;
 		if(mBuffer[10]==0&&mBuffer[11]==2&&mBuffer[12]==(TO_SERVER_cAckGateWayLogin>>8)&&(mBuffer[13]==(u8)TO_SERVER_cAckGateWayLogin)&&mBuffer[14]==0)
 		{
 			if(mBuffer[15]==1)
@@ -418,12 +439,39 @@ bool APP::LogIn()
 				mToServerLogInStatus=-1;//失败
 		}
 	}
+	else//链路不通
+	{
+		mToServerConnectionHealth=false;
+	}
 	if(mToServerLogInStatus==0)//登录失败
 		mToServerLogInStatus=-1;
+	
 	if(mToServerLogInStatus==1)
+	{
+		for(uint8_t i=0;i<2;++i)//用灯光提示登录成功，闪两下
+		{
+			mLedRed.On();
+			mLedGreen.On();
+			TaskManager::DelayMs(200);
+			mLedRed.Off();
+			mLedGreen.Off();
+			TaskManager::DelayMs(200);
+		}
 		return true;
+	}
 	else
+	{
+		for(uint8_t i=0;i<4;++i)//用灯光提示登录成功，闪四下
+		{
+			mLedRed.On();
+			mLedGreen.On();
+			TaskManager::DelayMs(200);
+			mLedRed.Off();
+			mLedGreen.Off();
+			TaskManager::DelayMs(200);
+		}
 		return false;
+	}
 }
 
 

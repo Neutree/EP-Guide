@@ -186,6 +186,7 @@ static const unsigned char mPICCDefaultKey[6];
 /*************************私有变量*************************************/
 unsigned char mTagInfo[MFRC522_MaxReceiveLen];
 uint16_t mReqLinkCheckInterval; //心跳包间隔定义 单位：S
+uint16_t mLogInFailRetryInterval; //登录失败重试间隔间隔定义 单位：S
 int8_t mToServerConnectionHealth; //标志与服务器的连接情况，由链路请求（心跳）控制 1:健康 -1：失去连接 0：正在检测
 int8_t mToServerLogInStatus; //标志与服务器的连接情况，由链路请求（心跳）控制 1:已经登录 -1：未登录 0：正在登录
 unsigned char mBuffer[APP_BUFFER_SIZE];
