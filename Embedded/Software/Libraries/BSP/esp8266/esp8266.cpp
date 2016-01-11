@@ -646,8 +646,11 @@
 	{
 		rx_empty();
 		mUsart<<"AT+CIPSEND="<<mux_id<<","<<len<<"\r\n";
-		mUsart<<buffer;
-		return recvFind("OK");
+		if(!recvFind("OK\r\n> "))
+			return false;
+		rx_empty();
+		mUsart.SendData((uint8_t*)buffer,len);
+		return recvFind("OK\r\n");
 	}
 	
 	
