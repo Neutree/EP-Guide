@@ -9,8 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONObject;
 
-import config.ConstantCode;
-import database.DBOpreate;
+import constant.ConstantCode;
+import dao.DBOpreate;
 
 public class TokenLogin extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

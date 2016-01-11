@@ -1,20 +1,24 @@
 package bean;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
+import tool.MergerByteList;
 
 public class Message {
-	private byte[] gMsgHead;//消息头：固定={(byte) 0xA4 , 0x02}
-	private byte[] gMsgID;//消息ID：网关维护
-	private byte[] gGtwMac;//网关Mac地址
-	private byte[] gMsgLen;//消息体长度
-	private byte[] bMsgCmd;//命令字
-	private byte[] bMsgBody;//消息体
-	private byte[] bMsgVrf;//校验字
-	
+	private byte[] gMsgHead;// 消息头：固定={(byte) 0xA4 , 0x02}
+	private byte[] gMsgID;// 消息ID：网关维护
+	private byte[] gGtwMac;// 网关Mac地址
+	private byte[] gMsgLen;// 消息体长度
+	private byte[] bMsgCmd;// 命令字
+	private byte[] bMsgBody;// 消息体
+	private byte[] bMsgVrf;// 校验字
+
 	public Message() {
 		super();
 	}
-	
+
 	public Message(byte[] gMsgHead, byte[] gMsgID, byte[] gGtwMac, byte[] gMsgLen, byte[] bMsgCmd, byte[] bMsgBody,
 			byte[] bMsgVrf) {
 		super();
@@ -91,6 +95,31 @@ public class Message {
 				+ Arrays.toString(bMsgVrf) + "]";
 	}
 	
+	public byte[] toBytesNotCheck() {
+		List<byte[]> bytes = new ArrayList<byte[]>();
+		bytes.add(gMsgHead);
+		bytes.add(gMsgID);
+		bytes.add(gGtwMac);
+		bytes.add(gMsgLen);
+		bytes.add(bMsgCmd);
+		bytes.add(bMsgBody);
+		byte[] backnews = MergerByteList.streamCopy(bytes);
+		return backnews;
+	}
+	
+	public byte[] toBytes() {
+		List<byte[]> bytes = new ArrayList<byte[]>();
+		bytes.add(gMsgHead);
+		bytes.add(gMsgID);
+		bytes.add(gGtwMac);
+		bytes.add(gMsgLen);
+		bytes.add(bMsgCmd);
+		bytes.add(bMsgBody);
+		bytes.add(bMsgVrf);
+		byte[] backnews = MergerByteList.streamCopy(bytes);
+		return backnews;
+	}
 	
 	
+
 }
