@@ -36,6 +36,10 @@
 /**************************对节点*****************************/
 #define To_NODE_cReqStatus              0x0201    //主控向节点请求状态信息
 #define To_NODE_cAckStatus              0x0901    //节点响应主控状态信息请求
+#define To_NODE_cReqLead                0x0202    //主控向节点请求道路引导
+#define To_NODE_cAckLead                0x0902    //节点响应主控道路引导请求
+#define To_NODE_cReqCompleteLead        0x0203    //主控向节点请求道路引导
+#define To_NODE_cAckCompletLead         0x0903    //节点响应主控道路引导请求
 
 class Communicate
 {

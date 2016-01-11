@@ -18,6 +18,7 @@
 #define APP_MAX_PARKING_SPACE_SIZE 50      //最多同时50个车位
 #define APP_MAX_IP_ADDRESS_BUFFER_SIZE 200 //最多50个车位，每个4个字节的IP地址
 
+
 typedef enum
 {
 	NodeStatus_OFF_Line = 0x80, //掉线
@@ -104,6 +105,15 @@ bool ReqAddNewNode(unsigned char macAddress[6]);
 ///@retval 是否成功
 ///////////////////////////
 bool ReqDelNode(unsigned char macAddress[6]);
+
+
+/////////////////////////////////////////
+///向节点请求道路引导
+///@param macAddress 引导节点顺序，最后一个为终点车位
+///@param number 参与引导的车位数量
+///@retval 是否成功
+/////////////////////////////////////////
+bool ReqShorestLead(unsigned char macAddress[][6],uint16_t *number);
 	
 /***********************************************************************************/
 
@@ -127,7 +137,23 @@ void FindCar();
 ///@param 车位的mac地址
 ///@retval 节点状态 
 ///////////////////////////////////////
-NodeStatus QueryNodeStatus(unsigned char carID[4],unsigned char macAddress[6]);
+NodeStatus QueryNodeStatus(unsigned char carID[4],unsigned char macAddress[6],unsigned char ipAddress[4]);
+
+/////////////////////////////////////////
+///向节点请求道路引导
+///@param macAddress 引导节点顺序，最后一个为终点车位
+///@param number 参与引导的车位数量
+///@retval 是否成功
+/////////////////////////////////////////
+bool ReqLead(unsigned char macAddress[][6],uint16_t number);
+
+/////////////////////////////////////////
+///向节点请求道路引导
+///@param macAddress 引导节点顺序，最后一个为终点车位
+///@param number 参与引导的车位数量
+///@retval 是否成功
+/////////////////////////////////////////
+bool ReqCompleteLead(unsigned char macAddress[][6],uint16_t number);
 
 /////////////////////////////////////////
 ///查询节点的MAC地址是否在节点信息中，以及是否被禁用
@@ -137,6 +163,8 @@ uint8_t RoleStatus(uint8_t macAddress[6]);
 
 /////////////////////////////////////////
 ///根据mac地址寻找节点的IP地址
+///@param mac地址
+///@param ip 地址
 /////////////////////////////////////////
 bool FinIPbyMacAddress(uint8_t macAddress[6],uint8_t ip[4]);
 /************************************************************************************/
@@ -194,9 +222,13 @@ unsigned char mBuffer[APP_BUFFER_SIZE];
 
 //wifi客户端信息（IP地址保存）
 unsigned char mIPBuffer[APP_MAX_PARKING_SPACE_SIZE][4];
-
+unsigned char mMacBuffer[APP_MAX_PARKING_SPACE_SIZE][6];
+unsigned short mLeadNumber; //参与引导的车位数量
 //车位信息
 AllNodeInfo mAllNodeInfo;
+
+bool mIsleadNow;//标志是否正在进行引导动作
+
 /*******************************************************************/
 
 

@@ -2,7 +2,7 @@
 #define _LED_H
 
 #include "GPIO.h"
-
+#include "TaskManager.h"
 class LED
 {
 	public:
@@ -28,6 +28,23 @@ class LED
 		///关闭LED
 		////////////////////
 		void Off();
+		
+		////////////////////////
+		///闪烁n次
+		///@param time 闪烁次数
+		///@param Interval 闪烁间隔(ms)
+		///////////////////////
+		void Blink(uint8_t time,uint16_t interval);
+		
+		////////////////////////
+		///两个灯一起闪烁n次
+		///@param 另一个灯的引用
+		///@param time 闪烁次数
+		///@param Interval 闪烁间隔(ms)
+		///////////////////////
+		void Blink2(LED &led,uint8_t time,uint16_t interval);
+		
+		
 	private:
 		//////////////////////////
 		///GPIO的类的实例对象引用
