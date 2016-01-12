@@ -15,17 +15,13 @@ APP app;
 ///////////////////////////
 APP::APP()
 :mLedRedGPIO(GPIOB,0,GPIO_Mode_Out_PP,GPIO_Speed_50MHz),mLedGreenGPIO(GPIOB,1,GPIO_Mode_Out_PP,GPIO_Speed_50MHz),
-mBuzzerGPIO(GPIOB,5,GPIO_Mode_Out_PP,GPIO_Speed_50MHz),
 mCOM1(1,115200,true),mCOM2(2,9600,true),
 mLedRed(mLedRedGPIO,false),mLedGreen(mLedGreenGPIO,false),
-mBuzzer(mBuzzerGPIO,false),
 mRFID(&mCOM2),
 mWIFI(mCOM1,115200)	
 {
-	mReqLinkCheckInterval=10;        //心跳包间隔30s
-	mLogInFailRetryInterval=5;       //登录失败重试间隔间隔定义 单位：S
 	mToServerConnectionHealth=-1;    //与服务器的连接初始化为失去连接
-	mToServerLogInStatus=-1;     	//未登录
+	mToServerSignUpStatus=-1;     	//未注册
 	mIsleadNow=false;                //未进行引导动作
 	
 	//车位信息初始化

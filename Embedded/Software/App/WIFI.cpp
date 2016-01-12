@@ -59,7 +59,7 @@ bool WIFI::Init(esp8266 &wifi)
 ////////////////////////
 ///将字符串形式的MAC地址转换为字节形式的，6个字节
 ///////////////////////
-void WIFI::MacAddressStringToBytes(char* macStr, char macAddress[6])
+void WIFI::MacAddressStringToBytes(char* macStr,unsigned char macAddress[6])
 {
 	char j = 0;
 	for (unsigned char i = 0; i<17;)

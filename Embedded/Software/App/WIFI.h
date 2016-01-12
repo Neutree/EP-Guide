@@ -38,7 +38,7 @@ public:
 	////////////////////////
 	///将字符串形式的MAC地址转换为字节形式的，6个字节
 	///////////////////////
-	static void MacAddressStringToBytes(char* macStr, char macAddress[6]);
+	static void MacAddressStringToBytes(char* macStr,unsigned char macAddress[6]);
 
 	///////////////////////////////
 	///将IP字符串转换为数组

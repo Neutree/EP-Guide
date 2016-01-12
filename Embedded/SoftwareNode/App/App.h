@@ -177,7 +177,6 @@ private:
 	//GPIO
 	GPIO mLedRedGPIO;
 	GPIO mLedGreenGPIO;
-	GPIO mBuzzerGPIO;
 	//串口1
 	USART mCOM1;
 	//串口2
@@ -190,8 +189,6 @@ private:
 	//LED
 	LED mLedRed;
 	LED mLedGreen;
-	///Buzzer
-	Buzzer mBuzzer;
 	//RFID
 	MFRC522 mRFID;
 	//WIFI
@@ -213,10 +210,8 @@ static const unsigned char mPICCDefaultKey[6];
 
 /*************************私有变量*************************************/
 unsigned char mTagInfo[MFRC522_MaxReceiveLen];
-uint16_t mReqLinkCheckInterval; //心跳包间隔定义 单位：S
-uint16_t mLogInFailRetryInterval; //登录失败重试间隔间隔定义 单位：S
 int8_t mToServerConnectionHealth; //标志与服务器的连接情况，由链路请求（心跳）控制 1:健康 -1：失去连接 0：正在检测
-int8_t mToServerLogInStatus; //标志与服务器的连接情况，由链路请求（心跳）控制 1:已经登录 -1：未登录 0：正在登录
+int8_t mToServerSignUpStatus; //是否注册到系统中 1:已经注册 -1：未注册 0：正在登录
 unsigned char mBuffer[APP_BUFFER_SIZE];
 //unsigned char mBufferReceive[APP_BUFFER_SIZE];//用来接收数据的缓冲区
 

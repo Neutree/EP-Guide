@@ -40,6 +40,8 @@
 #define To_NODE_cAckLead                0x0902    //节点响应主控道路引导请求
 #define To_NODE_cReqCompleteLead        0x0203    //主控向节点请求道路引导
 #define To_NODE_cAckCompletLead         0x0903    //节点响应主控道路引导请求
+#define To_NODE_cReqDisable             0x0204    //主控向节点请求禁用节点
+#define To_NODE_cAckDisable             0x0904    //节点响应主控禁用节点请求
 
 class Communicate
 {

@@ -195,12 +195,20 @@ if(status&NodeStatus_On_line)//在线
 {
 	if(RoleStatus(macAddr)==0)//新的节点，发送新的节点请求
 	{
-		if(ReqAddNewNode(macAddr))//请求添加成功,添加到节点信息中
+		int8_t status=ReqAddNewNode(macAddr);
+		if(status==0)//请求添加成功,添加到节点信息中
 		{
 			memcpy(mAllNodeInfo.nodeInfo[mAllNodeInfo.number].ipAddress,ipAddr,4);
 			memcpy(mAllNodeInfo.nodeInfo[mAllNodeInfo.number].macAdress,macAddr,4);
 			mAllNodeInfo.nodeInfo[mAllNodeInfo.number].status=NodeStatus_Free;
 			mAllNodeInfo.number+=1;
+		}
+		else if(status==-2)//请求被拒绝,向节点发送禁用请求，让节点在下次上电前都不再发送注册信息
+		{
+			if(ReqDisableNode(macAddr,ipAddr))
+			{
+			}
+				
 		}
 	}
 	else//不是新节点
@@ -399,7 +407,7 @@ bool APP::LogIn()
 	uint16_t temp=Communicate::ToServerGenerateMessageID();
 	Communicate::mCommunicatePack[2]=temp>>8;//消息ID高字节
 	Communicate::mCommunicatePack[3]=temp&0x00ff;//消息ID低字节
-	char mac[6]={0,0,0,0,0,0};
+	unsigned char mac[6]={0,0,0,0,0,0};
 	WIFI::MacAddressStringToBytes((char*)WIFI::mStationMac,mac);  //MAC地址不发送，加密后放在消息体后发送（在mac地址串后面加"A-402"后加密）
 	memcpy(&Communicate::mCommunicatePack[4],mac,6);//复制mac地址
 
@@ -490,7 +498,7 @@ bool APP::ReqChangeStatus(unsigned char macAddress[6],NodeStatus status,unsigned
 	uint16_t temp=Communicate::ToServerGenerateMessageID();
 	Communicate::mCommunicatePack[2]=temp>>8;//消息ID高字节
 	Communicate::mCommunicatePack[3]=temp&0x00ff;//消息ID低字节
-	char mac[6]={0,0,0,0,0,0};
+	unsigned char mac[6]={0,0,0,0,0,0};
 	WIFI::MacAddressStringToBytes((char*)WIFI::mStationMac,mac);
 	memcpy(&Communicate::mCommunicatePack[4],mac,6);//复制主控mac地址
 	Communicate::mCommunicatePack[10]=0;//消息体长度高位：0
@@ -528,15 +536,15 @@ bool APP::ReqChangeStatus(unsigned char macAddress[6],NodeStatus status,unsigned
 ///////////////////////////
 ///请求添加新的节点
 ///@param macAddress 新节点的mac地址
-///@retval 是否成功
+///@retval 是否成功 0：成功 -1：通信失败 -2：请求被拒绝
 ///////////////////////////
-bool APP::ReqAddNewNode(unsigned char macAddress[6])
+int8_t APP::ReqAddNewNode(unsigned char macAddress[6])
 {
 	//帧数据合成
 	uint16_t temp=Communicate::ToServerGenerateMessageID();
 	Communicate::mCommunicatePack[2]=temp>>8;//消息ID高字节
 	Communicate::mCommunicatePack[3]=temp&0x00ff;//消息ID低字节
-	char mac[6]={0,0,0,0,0,0};
+	unsigned char mac[6]={0,0,0,0,0,0};
 	WIFI::MacAddressStringToBytes((char*)WIFI::mStationMac,mac);
 	memcpy(&Communicate::mCommunicatePack[4],mac,6);//复制主控mac地址
 	Communicate::mCommunicatePack[10]=0;//消息体长度高位：0
@@ -563,13 +571,15 @@ bool APP::ReqAddNewNode(unsigned char macAddress[6])
 				{
 					
 				}
-				return true;
+				return 0;
 			}
-			else
-				return false;
+			else//请求被拒绝
+			{
+				return -2;
+			}
 		}
 	}
-	return false;
+	return -1;
 }
 
 
@@ -584,7 +594,7 @@ bool APP::ReqDelNode(unsigned char macAddress[6])
 	uint16_t temp=Communicate::ToServerGenerateMessageID();
 	Communicate::mCommunicatePack[2]=temp>>8;//消息ID高字节
 	Communicate::mCommunicatePack[3]=temp&0x00ff;//消息ID低字节
-	char mac[6]={0,0,0,0,0,0};
+	unsigned char mac[6]={0,0,0,0,0,0};
 	WIFI::MacAddressStringToBytes((char*)WIFI::mStationMac,mac);
 	memcpy(&Communicate::mCommunicatePack[4],mac,6);//复制主控mac地址
 	Communicate::mCommunicatePack[10]=0;//消息体长度高位：0
@@ -663,6 +673,8 @@ bool APP::ReqShorestLead(unsigned char macAddress[][6],uint16_t* number)
 
 
 
+
+
 ////////////////////////////////////////
 ///轮询节点信息
 ///@param 车的编号（RFID卡的编号），车位状态改变时carID有值，进（出）车库的车的编号
@@ -680,7 +692,7 @@ NodeStatus APP::QueryNodeStatus(unsigned char carID[4],unsigned char macAddress[
 		//获取连接到主控的节点ip
 		char* ipStr = mWIFI.getJoinedDeviceIP();
 		NodeNumber = WIFI::IPStringsToBytes(ipStr,mIPBuffer);
-	}
+	}	
 	++queryNodeCount;//计数累加
 	if(NodeNumber<queryNodeCount)//已经遍历每个节点了
 	{
@@ -781,7 +793,7 @@ bool APP::ReqLead(unsigned char macAddress[][6],uint16_t number)
 			Communicate::mCommunicatePack[14]=0x11;
 		Communicate::mCommunicatePack[15]=MathTool::CheckSum8((unsigned char*)Communicate::mCommunicatePack,15);
 		unsigned char ip_[4];
-		if(!FinIPbyMacAddress(macAddress[count],ip_))
+		if(!FindIPbyMacAddress(macAddress[count],ip_))
 			return false;
 		Communicate::SendBytesToServer(mWIFI,(char*)ip_,WIFI::mNodePort,Communicate::mCommunicatePack,16);
 		
@@ -833,7 +845,7 @@ bool APP::ReqCompleteLead(unsigned char macAddress[][6],uint16_t number)
 		Communicate::mCommunicatePack[13]=To_NODE_cReqLead&0x00ff;//命令字低字节
 		Communicate::mCommunicatePack[14]=MathTool::CheckSum8((unsigned char*)Communicate::mCommunicatePack,14);
 		unsigned char ip_[4];
-		if(!FinIPbyMacAddress(macAddress[count],ip_))
+		if(!FindIPbyMacAddress(macAddress[count],ip_))
 			return false;
 		Communicate::SendBytesToServer(mWIFI,(char*)ip_,WIFI::mNodePort,Communicate::mCommunicatePack,15);
 		
@@ -858,7 +870,45 @@ bool APP::ReqCompleteLead(unsigned char macAddress[][6],uint16_t number)
 	return true;
 }
 
+////////////////////////////////////////
+///请求禁用节点
+///@param macAddr 请求禁用的mac地址
+///@param ipAddr  请求禁用的ip地址
+///@retval 是否禁用成功
+////////////////////////////////////////
+bool APP::ReqDisableNode(uint8_t macAddr[6],uint8_t ipAddr[4])
+{
+	//帧数据合成
+	uint16_t temp=Communicate::ToServerGenerateMessageID();
+	Communicate::mCommunicatePack[2]=temp>>8;//消息ID高字节
+	Communicate::mCommunicatePack[3]=temp&0x00ff;//消息ID低字节
+	unsigned char mac[6];
+	WIFI::MacAddressStringToBytes((char*)WIFI::mStationMac,mac);
+	memcpy(&Communicate::mCommunicatePack[4],mac,6);//复制mac地址
 
+	
+	Communicate::mCommunicatePack[10]=0;//消息体长度：高位
+	Communicate::mCommunicatePack[11]=0;//消息体长度：低位
+	Communicate::mCommunicatePack[12]=To_NODE_cReqDisable>>8;//命令字高字节
+	Communicate::mCommunicatePack[13]=To_NODE_cReqDisable&0x00ff;//命令字低字节
+	Communicate::mCommunicatePack[14]=MathTool::CheckSum8((unsigned char*)Communicate::mCommunicatePack,14);
+
+	Communicate::SendBytesToServer(mWIFI,(char*)ipAddr,WIFI::mNodePort,Communicate::mCommunicatePack,15);
+	
+	//等待服务器响应（中间会执行RFID扫描）
+	
+	if(WaitReceiveAndDecode())
+	{
+		if(mBuffer[10]==0&&mBuffer[11]==1&&mBuffer[12]==(To_NODE_cReqDisable>>8)&&(mBuffer[13]==(u8)To_NODE_cReqDisable))
+		{
+			if(mBuffer[14]==1)
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
 
 /////////////////////////////////////////
 ///查询节点的MAC地址是否在节点信息中，以及是否被禁用
@@ -883,7 +933,7 @@ uint8_t APP::RoleStatus(uint8_t macAddress[6])
 /////////////////////////////////////////
 ///根据mac地址寻找节点的IP地址
 /////////////////////////////////////////
-bool APP::FinIPbyMacAddress(uint8_t macAddress[6],uint8_t ip[4])
+bool APP::FindIPbyMacAddress(uint8_t macAddress[6],uint8_t ip[4])
 {
 	for(uint8_t i=0;i<mAllNodeInfo.number;++i)
 	{
@@ -896,6 +946,23 @@ bool APP::FinIPbyMacAddress(uint8_t macAddress[6],uint8_t ip[4])
 	return false;
 }
 
+////////////////////////////////////////
+///寻找mac地址相对应的节点的下标
+///@param macAddress mac地址
+///@retval 下标，如果没找到，返回0xffff
+////////////////////////////////////////
+uint16_t APP::IndexOfMacAddress(uint8_t macAddress[6])
+{
+	for(uint8_t i=0;i<mAllNodeInfo.number;++i)
+	{
+		if(memcmp(macAddress,mAllNodeInfo.nodeInfo[i].macAdress,6)==0)//找到节点信息
+		{
+			memcpy(macAddress,mAllNodeInfo.nodeInfo[i].macAdress,6);
+			return i;
+		}
+	}
+	return 0xffff;
+}
 
 
 

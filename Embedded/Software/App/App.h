@@ -95,9 +95,9 @@ bool ReqChangeStatus(unsigned char macAddress[6],NodeStatus status,unsigned char
 ///////////////////////////
 ///请求添加新的节点
 ///@param macAddress 新节点的mac地址
-///@retval 是否成功
+///@retval 是否成功 0：成功 -1：通信失败 -2：请求被拒绝
 ///////////////////////////
-bool ReqAddNewNode(unsigned char macAddress[6]);
+int8_t ReqAddNewNode(unsigned char macAddress[6]);
 
 ///////////////////////////
 ///请求删除节点
@@ -155,6 +155,17 @@ bool ReqLead(unsigned char macAddress[][6],uint16_t number);
 /////////////////////////////////////////
 bool ReqCompleteLead(unsigned char macAddress[][6],uint16_t number);
 
+
+////////////////////////////////////////
+///请求禁用节点
+///@param macAddr 请求禁用的mac地址
+///@param ipAddr  请求禁用的ip地址
+///@retval 是否禁用成功
+////////////////////////////////////////
+bool ReqDisableNode(uint8_t macAddr[6],uint8_t ipAddr[4]);
+
+
+
 /////////////////////////////////////////
 ///查询节点的MAC地址是否在节点信息中，以及是否被禁用
 ///@retval 0:没有该节点信息，是新的节点  1：有该节点的信息，是已经添加了的节点 
@@ -166,8 +177,15 @@ uint8_t RoleStatus(uint8_t macAddress[6]);
 ///@param mac地址
 ///@param ip 地址
 /////////////////////////////////////////
-bool FinIPbyMacAddress(uint8_t macAddress[6],uint8_t ip[4]);
+bool FindIPbyMacAddress(uint8_t macAddress[6],uint8_t ip[4]);
 /************************************************************************************/
+
+////////////////////////////////////////
+///寻找mac地址相对应的节点的下标
+///@param macAddress mac地址
+///@retval 下标，如果没找到，返回0xffff
+////////////////////////////////////////
+uint16_t IndexOfMacAddress(uint8_t macAddress[6]);
 
 private:
 /**************************硬件资源*******************************/
