@@ -33,7 +33,6 @@ bool WIFI::Init(esp8266 &wifi)
 {
 //	if(!wifi.kick())//检测是否存在
 //		return false;
-
 	wifi.setEcho(1);//关闭回显
 	wifi.setOprToStation(1,1);//设置为station模式
 	wifi.setStationMac((char*)mStationMac,1);//set station mac adress

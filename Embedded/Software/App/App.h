@@ -33,11 +33,10 @@ typedef enum
 
 typedef struct 
 {
-	unsigned char macAdress[6];    //MAC地址
-	unsigned char ipAddress[4];    //IP地址
-	NodeStatus status;             //节点状态（是否空闲、掉线等）
-	bool reserved;                 //预约了
-	bool checked;                  //用来进行轮询时作为是否轮询过了的标记用的
+	unsigned char macAdress[6];
+	unsigned char ipAddress[4];
+	NodeStatus status;
+	bool checked;
 }NodeInfo;
 
 
@@ -138,7 +137,7 @@ void FindCar();
 ///@param 车位的mac地址
 ///@retval 节点状态 
 ///////////////////////////////////////
-uint8_t QueryNodeStatus(unsigned char carID[4],unsigned char macAddress[6],unsigned char ipAddress[4]);
+NodeStatus QueryNodeStatus(unsigned char carID[4],unsigned char macAddress[6],unsigned char ipAddress[4]);
 
 /////////////////////////////////////////
 ///向节点请求道路引导

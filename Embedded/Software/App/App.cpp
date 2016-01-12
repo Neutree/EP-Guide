@@ -94,7 +94,7 @@ void APP::Loop()
 
 	timeNew=TaskManager::Time();
 	
-/*	//RFID 健康状况,器件存在问题时不会执行--②--
+	//RFID 健康状况,器件存在问题时不会执行--②--
 	if(!mRFID.mHealth)
 	{
 		static double timeOld=TaskManager::Time();
@@ -154,15 +154,15 @@ void APP::Loop()
 		return;
 	}
 	haveWrong=false;
-*/
+
 /*******************************************************************************/
 
 	
 /****************************--②--车辆检测**************************************/
 
 /*******************************************************************************/
-/*	FindCar();
-*/
+	FindCar();
+
 /*********************--③--接收到的信息处理（取出完整的有效数据帧）***************/
 	
 
@@ -172,7 +172,7 @@ void APP::Loop()
 
 
 
-/*************************--④--链路保持（心跳包），周期为30秒********************//*
+/*************************--④--链路保持（心跳包），周期为30秒********************/
 static uint32_t heartBeatTimeOld=0;
 
 //时间到发送链路请求
@@ -182,7 +182,7 @@ if(timeNew-heartBeatTimeOld>=mReqLinkCheckInterval)
 	WaitHeartBeatRequestAck(); //应弃用，可能会导致阻塞
 	heartBeatTimeOld=timeNew;
 }
-*/
+
 /******************************************************************************/
 
 
@@ -191,10 +191,11 @@ unsigned char cardId[4];
 unsigned char macAddr[6];
 unsigned char ipAddr[4];
 static double timeOld=TaskManager::Time();
-if(timeNew-timeOld>15)//每2秒两轮询一个节点
+if(timeNew-timeOld>10)
 {
 	timeOld=timeNew;
-/*
+	NodeStatus status = QueryNodeStatus(cardId,macAddr,ipAddr);//包含掉线检查
+/*//测试
 	static bool a=true;
 	mMacBuffer[0][0]=0x12;
 				mMacBuffer[0][1]=0x08;
@@ -277,6 +278,7 @@ if(timeNew-timeOld>15)//每2秒两轮询一个节点
 //	}
 //	else
 //		mCOM1<<"No Node2\r\n\r\n";
+
 }
 
 
@@ -424,23 +426,15 @@ void APP::FindCar()
 				mLedGreen.Blink(2,100);
 				//mCOM1<<"ID:"<<mTagInfo[0]<<"\t"<<mTagInfo[1]<<"\t"<<mTagInfo[2]<<"\t"<<mTagInfo[3]<<"\n";
 				//请求最短路径配置
-			/*	if(ReqShorestLead(mMacBuffer,&mLeadNumber))
-				{*/	
-				
-				mMacBuffer[0][0]=0x12;
-				mMacBuffer[0][1]=0x08;
-				mMacBuffer[0][2]=0x07;
-				mMacBuffer[0][3]=0x72;
-				mMacBuffer[0][4]=0x07;
-				mMacBuffer[0][5]=0x02;
-				mLeadNumber=1;
+				if(ReqShorestLead(mMacBuffer,&mLeadNumber))
+				{
 					//请求节点进行引导
 					if(ReqLead(mMacBuffer,mLeadNumber))
 					{
 						mRFID.PcdHalt();//ID卡休眠（车离开门禁之前不再扫描）
 						mIsleadNow=true;//标志正在进行引导
 					}
-			/*	}*/
+				}
 			}
 		}
 	}
@@ -662,7 +656,7 @@ bool APP::ReqDelNode(unsigned char macAddress[6])
 	//获取响应
 	if(WaitReceiveAndDecode())
 	{
-		if(mBuffer[10]==0&&mBuffer[11]==2&&mBuffer[12]==(TO_SERVER_cAckNodeDel>>8)&&(mBuffer[13]==(u8)TO_SERVER_cAckNodeDel)&&mBuffer[14]==0)
+		if(mBuffer[10]==0&&mBuffer[11]==4&&mBuffer[12]==(TO_SERVER_cAckNodeDel>>8)&&(mBuffer[13]==(u8)TO_SERVER_cAckNodeDel)&&mBuffer[14]==0)
 		{
 			if(mBuffer[15]==1)//删除成功
 				return true;
@@ -733,7 +727,7 @@ bool APP::ReqShorestLead(unsigned char macAddress[][6],uint16_t* number)
 ///@param 车位的mac地址
 ///@retval 节点状态 
 ///////////////////////////////////////
-uint8_t APP::QueryNodeStatus(unsigned char carID[4],unsigned char macAddress[6],unsigned char ipAddress[4])
+NodeStatus APP::QueryNodeStatus(unsigned char carID[4],unsigned char macAddress[6],unsigned char ipAddress[4])
 {
 	static uint8_t queryNodeCount=0,NodeNumber=0;
 	if(queryNodeCount==0)
@@ -744,8 +738,6 @@ uint8_t APP::QueryNodeStatus(unsigned char carID[4],unsigned char macAddress[6],
 		//获取连接到主控的节点ip
 		char* ipStr = mWIFI.getJoinedDeviceIP();
 		NodeNumber = WIFI::IPStringsToBytes(ipStr,mIPBuffer);
-		if(NodeNumber==0)//没有节点
-			return NodeStatus_OFF_Line;
 	}	
 	++queryNodeCount;//计数累加
 	if(NodeNumber<queryNodeCount)//已经遍历每个节点了
@@ -755,19 +747,18 @@ uint8_t APP::QueryNodeStatus(unsigned char carID[4],unsigned char macAddress[6],
 		{
 			if(mAllNodeInfo.nodeInfo[i].checked==false)//没有检测到的节点,发送删除节点请求，如果失败，则报警，提示错误信息
 			{
-		/*		if(ReqDelNode(mAllNodeInfo.nodeInfo[i].macAdress))//删除节点成功
-				{*/
+				if(ReqDelNode(mAllNodeInfo.nodeInfo[i].macAdress))//删除节点成功
+				{
 					//删除这个节点的信息
 					for(uint16_t j=i;j<mAllNodeInfo.number;++j)
 					{
 						mAllNodeInfo.nodeInfo[j]=mAllNodeInfo.nodeInfo[j+1];
 					}
-					mAllNodeInfo.number--;
-		/*		}
+				}
 				else                                              //删除失败
 				{
 					
-				}*/
+				}
 			}
 		}
 		queryNodeCount=0;
@@ -783,20 +774,22 @@ uint8_t APP::QueryNodeStatus(unsigned char carID[4],unsigned char macAddress[6],
 */
 		
 		Communicate::mCommunicatePack[10]=0;//消息体长度：高位
-		Communicate::mCommunicatePack[11]=1;//消息体长度：低位
+		Communicate::mCommunicatePack[11]=0;//消息体长度：低位
 		Communicate::mCommunicatePack[12]=To_NODE_cReqStatus>>8;//命令字高字节
 		Communicate::mCommunicatePack[13]=To_NODE_cReqStatus&0x00ff;//命令字低字节
-		Communicate::mCommunicatePack[14]=mAllNodeInfo.nodeInfo[queryNodeCount-1].reserved?1:0;
-		Communicate::mCommunicatePack[15]=MathTool::CheckSum8((unsigned char*)Communicate::mCommunicatePack,15);
+		Communicate::mCommunicatePack[14]=MathTool::CheckSum8((unsigned char*)Communicate::mCommunicatePack,14);
 		char ip_[16];
 		WIFI::IPBytesToString(mIPBuffer[queryNodeCount-1],ip_);
-		Communicate::SendBytesToServer(mWIFI,(char*)ip_,WIFI::mNodePort,Communicate::mCommunicatePack,16);
+		Communicate::SendBytesToServer(mWIFI,(char*)ip_,WIFI::mNodePort,Communicate::mCommunicatePack,15);
 		
 		//等待服务器响应（中间会执行RFID扫描）
 		
 		if(WaitReceiveAndDecode())
 		{
-			mCOM1<<"wait ack succese 1\r\n";
+			/*if(mBuffer[10]==0&&mBuffer[11]==2&&mBuffer[12]==(TO_SERVER_cAckGateWayLogin>>8)&&(mBuffer[13]==(u8)TO_SERVER_cAckGateWayLogin)&&mBuffer[14]==0)
+			{
+				
+			}*/
 			mAllNodeInfo.nodeInfo[queryNodeCount-1].checked=true;//标志应询问过了
 			if(mBuffer[10]==0&&mBuffer[11]==5&&mBuffer[12]==(To_NODE_cAckStatus>>8)&&(mBuffer[13]==(u8)To_NODE_cAckStatus))
 			{
@@ -805,12 +798,11 @@ uint8_t APP::QueryNodeStatus(unsigned char carID[4],unsigned char macAddress[6],
 				for(uint8_t i=0;i<4;++i)//车辆ID号
 					carID[i]=mBuffer[i+15];
 				memcpy(ipAddress,mIPBuffer[queryNodeCount-1],4);
-				return mBuffer[14]|NodeStatus_On_line;
+				return (NodeStatus)mBuffer[14];
 			}
 		}
 		else
 		{
-			mCOM1<<"wait ack fail 1\r\n";
 			return NodeStatus_OFF_Line;
 		}
 	}
