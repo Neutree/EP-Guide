@@ -1,3 +1,4 @@
+
 # include "App.h"
 
 int main()
@@ -12,7 +13,27 @@ int main()
 
 
 
+
+
+
+
+
+
+
 /*
+# include "USART.h"
+# include "MFRC522.h"
+# include "GPIO.h"
+
+*//*GPIO rfidResetPin(GPIOA,0,GPIO_Mode_Out_PP,GPIO_Speed_50MHz);*//*
+GPIO ledGreen(GPIOB,1,GPIO_Mode_Out_PP,GPIO_Speed_50MHz);
+GPIO ledRed(GPIOB,0,GPIO_Mode_Out_PP,GPIO_Speed_50MHz);
+USART com1(1,115200,true);
+USART com2(2,9600,true);
+
+
+MFRC522 rfid1(&com2);
+
 //PICC默认密码(6个字节均为0xff)
 const unsigned char DefaultKey[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 const unsigned char data1[16] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
@@ -54,6 +75,7 @@ int main()
 			com1<<"write fail\n";
 		com1<<"value: "<<rfid1.ReadRawRC(2)<<"\n\n\n\n\n\n";
 		
+		temp2=11;
 		
 		if(rfid1.PcdRequest(MFRC522_PICC_REQALL,tagInfo))//寻到卡
 		{
@@ -108,4 +130,6 @@ int main()
 
 	}
 }
+
 */
+

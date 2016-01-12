@@ -513,7 +513,7 @@ bool MFRC522::Kick()
 	char temp=0,temp2=0;
 	temp = ReadRawRC(MFRC522_VersionReg);
 	temp2 = ReadRawRC(MFRC522_VersionReg);
-	if( (!temp&&!temp2) || (temp!=temp2))//两次读到的不相等，即不稳定，或者都为零
+	if( (!temp&&!temp2) || (temp!=temp2) ||temp<100)//两次读到的不相等，即不稳定，或者都为零
 	{	
 		mHealth=false;
 		return false;
