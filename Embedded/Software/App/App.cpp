@@ -11,7 +11,7 @@ APP app;
 
 
 ///////////////////////////
-///构造函数，执行片上资源初始化、片外资源初始化（包括片上到片外的装配）
+///构造函数，执行片上资源初始化、片外资源初始化（包括片上到片外的装配），以及变量初始化
 ///////////////////////////
 APP::APP()
 :mLedRedGPIO(GPIOB,0,GPIO_Mode_Out_PP,GPIO_Speed_50MHz),mLedGreenGPIO(GPIOB,1,GPIO_Mode_Out_PP,GPIO_Speed_50MHz),
@@ -60,7 +60,8 @@ void APP::InitHardware()
 	WIFI::Init(mWIFI);
 	
 	
-	mCOM1<<"LOG:Initialize complete\n\n\n";
+/*	mCOM1<<"LOG:Initialize complete\n\n\n";*/
+	
 	mLedRed.Blink3(mLedGreen,8,100);
 	mLedRed.Off();
 	mCOM1.ClearReceiveBuffer();
@@ -75,7 +76,7 @@ void APP::InitSoft()
 	LogIn();
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////循环执行部分////////////////////////////////////////////////////////////////////
 /////////////////////////////////
 ///循环执行部分
 /////////////////////////////////
@@ -88,12 +89,21 @@ void APP::Loop()
 		mBuzzer.On();
 	else
 		mBuzzer.Off();
-	
+//获取时间
+	static double timeNew=TaskManager::Time();
+
+	timeNew=TaskManager::Time();
 	
 	//RFID 健康状况,器件存在问题时不会执行--②--
 	if(!mRFID.mHealth)
 	{
+		static double timeOld=TaskManager::Time();
 		//mCOM1<<"LOG:RFID fail\n";
+		if(timeNew-timeOld>2)
+		{
+			mLedRed.Blink(2,100);
+			timeOld=timeNew;
+		}
 		//一直侦测健康状况
 		if(mRFID.Kick())//检测到，进行状态设置
 			mRFID.PCDReset();
@@ -119,7 +129,6 @@ void APP::Loop()
 	if(mToServerLogInStatus==-1)//没有登录
 	{
 		static double timeOld=TaskManager::Time();
-		double timeNew=TaskManager::Time();
 //		mCOM1<<"LOG:not log in\n";
 //		mCOM1<<timeNew<<"\t"<<timeOld<<"\n";
 		if(timeNew-timeOld>=mLogInFailRetryInterval)//登录失败重新登录
@@ -165,17 +174,13 @@ void APP::Loop()
 
 /*************************--④--链路保持（心跳包），周期为30秒********************/
 static uint32_t heartBeatTimeOld=0;
-static uint32_t heartBeatTimeNew=TaskManager::Time();
 
-heartBeatTimeNew=TaskManager::Time();
 //时间到发送链路请求
-if(heartBeatTimeNew-heartBeatTimeOld>=mReqLinkCheckInterval)
+if(timeNew-heartBeatTimeOld>=mReqLinkCheckInterval)
 {
 	HeartBeatRequest();
 	WaitHeartBeatRequestAck(); //应弃用，可能会导致阻塞
-//	if(mToServerConnectionHealth==-1)
-//		mCOM1<<"Connection fail\n";
-	heartBeatTimeOld=heartBeatTimeNew;
+	heartBeatTimeOld=timeNew;
 }
 
 /******************************************************************************/
@@ -226,7 +231,7 @@ if(status&NodeStatus_On_line)//在线
 /******************************************************************************/
 
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////循环执行部分结束/////////////////////////////////////////////////////////////////
 
 
 void APP::HeartBeatRequest()
@@ -364,11 +369,12 @@ void APP::FindCar()
 		{
 			if(mRFID.PcdAntiColl(mTagInfo))//防冲撞成功(找到一张卡序列号)
 			{
-				mLedGreen.On();
+				mLedGreen.Blink(2,100);
 				//mCOM1<<"ID:"<<mTagInfo[0]<<"\t"<<mTagInfo[1]<<"\t"<<mTagInfo[2]<<"\t"<<mTagInfo[3]<<"\n";
 				//请求最短路径配置
 				if(ReqShorestLead(mMacBuffer,&mLeadNumber))
 				{
+					//请求节点进行引导
 					if(ReqLead(mMacBuffer,mLeadNumber))
 					{
 						mRFID.PcdHalt();//ID卡休眠（车离开门禁之前不再扫描）
@@ -376,18 +382,10 @@ void APP::FindCar()
 					}
 				}
 			}
-			else
-			{
-				mLedGreen.Off();
-			}
 		}
 	}
-	else
-	{
-		mLedGreen.Off();
-		//mCOM1<<"fail\n";
-	}
-	mCOM1<<"version:"<<mRFID.ReadRawRC(0x37)<<"\n\n";
+	mRFID.Kick();
+//	mCOM1<<"version:"<<mRFID.ReadRawRC(0x37)<<"\n\n";
 }
 
 
@@ -463,28 +461,14 @@ bool APP::LogIn()
 	
 	if(mToServerLogInStatus==1)
 	{
-		for(uint8_t i=0;i<2;++i)//用灯光提示登录成功，闪两下
-		{
-			mLedRed.On();
-			mLedGreen.On();
-			TaskManager::DelayMs(200);
-			mLedRed.Off();
-			mLedGreen.Off();
-			TaskManager::DelayMs(200);
-		}
+		//闪两下
+		mLedGreen.Blink2(mLedRed,2,200);
 		return true;
 	}
 	else
 	{
-		for(uint8_t i=0;i<4;++i)//用灯光提示登录成功，闪四下
-		{
-			mLedRed.On();
-			mLedGreen.On();
-			TaskManager::DelayMs(200);
-			mLedRed.Off();
-			mLedGreen.Off();
-			TaskManager::DelayMs(200);
-		}
+		//闪两下
+		mLedGreen.Blink2(mLedRed,4,200);
 		return false;
 	}
 }
