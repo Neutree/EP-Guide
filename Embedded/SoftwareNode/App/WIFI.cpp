@@ -7,7 +7,7 @@ char WIFI::mSoftApPassword[20]="1208077207";
 char WIFI::mSoftApIP[16]="192.168.4.1";
 char WIFI::mSoftApGateway[16]="192.168.4.1";
 char WIFI::mSoftApNetmask[16]="255.255.255.0";*/
-uint32_t WIFI::mSoftApPort=345;
+uint32_t WIFI::mSoftApPort=456;
 uint16_t WIFI::mSoftApClientTimeOut=180;//s
 
 //Station
@@ -44,7 +44,9 @@ bool WIFI::Init(esp8266 &wifi)
 //	wifi.setSoftAPParam(mSoftApName,mSoftApPassword,5,3,1);//set station param
 //	wifi.setStationIp(mSoftApIP,mSoftApGateway,mSoftApNetmask,1);//set station's address (AP mode)
 //	wifi.setAPIp();
-	wifi.setDHCP(2,1,1);//enable softap and station DHCP 开启DHCP后,AP依然会使用上一句设置的IP和网关地址
+
+	wifi.setDHCP(1,1,1);//enable softap and station DHCP 开启DHCP后,AP依然会使用上一句设置的IP和网关地址
+	
 //	wifi.setDHCP(0,0,1);//enable softap and station DHCP 开启DHCP后,AP依然会使用上一句设置的IP和网关地址
 	wifi.enableMUX();// enable Mux(允许多连接)
 	wifi.startServer(mSoftApPort);//config server(AP) port

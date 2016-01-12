@@ -14,7 +14,7 @@ APP app;
 ///构造函数，执行片上资源初始化、片外资源初始化（包括片上到片外的装配），以及变量初始化
 ///////////////////////////
 APP::APP()
-:mLedRedGPIO(GPIOB,0,GPIO_Mode_Out_PP,GPIO_Speed_50MHz),mLedGreenGPIO(GPIOB,1,GPIO_Mode_Out_PP,GPIO_Speed_50MHz),
+:mLedRedGPIO(GPIOA,0,GPIO_Mode_Out_PP,GPIO_Speed_50MHz),mLedGreenGPIO(GPIOA,1,GPIO_Mode_Out_PP,GPIO_Speed_50MHz),
 mBuzzerGPIO(GPIOB,5,GPIO_Mode_Out_PP,GPIO_Speed_50MHz),
 mCOM1(1,115200,true),mCOM2(2,9600,true),
 mLedRed(mLedRedGPIO,false),mLedGreen(mLedGreenGPIO,false),
@@ -194,7 +194,7 @@ static double timeOld=TaskManager::Time();
 if(timeNew-timeOld>15)//每2秒两轮询一个节点
 {
 	timeOld=timeNew;
-
+/*
 	static bool a=true;
 	mMacBuffer[0][0]=0x12;
 				mMacBuffer[0][1]=0x08;
@@ -214,7 +214,7 @@ if(timeNew-timeOld>15)//每2秒两轮询一个节点
 		else
 			mCOM1<<"del ffffc\r\n";
 		a=a?false:true;
-
+*/
 		
 //	uint8_t status = QueryNodeStatus(cardId,macAddr,ipAddr);//包含掉线检查
 //	if(status&NodeStatus_On_line)//在线

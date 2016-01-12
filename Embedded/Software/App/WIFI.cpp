@@ -11,34 +11,37 @@ uint32_t WIFI::mSoftApPort=345;
 uint16_t WIFI::mSoftApClientTimeOut=180;//s
 
 //Station
-char WIFI::mJoinApName[13]="nomore";
-char WIFI::mJoinApPassword[20]="morenimei0";
-//char WIFI::mJoinApName[13]="ICanHearYou";
-//char WIFI::mJoinApPassword[20]="1208077207";
+//char WIFI::mJoinApName[13]="nomore";
+//char WIFI::mJoinApPassword[20]="morenimei0";
+char WIFI::mJoinApName[13]="ICanHearYou";
+char WIFI::mJoinApPassword[20]="1208077207";
 unsigned char WIFI::mStationMac[18]="12:08:07:72:07:01";
 
 //server
-char WIFI::mServerIPOrDomain[30]="192.168.191.1";
+char WIFI::mServerIPOrDomain[30]="192.168.155.1";
 uint32_t WIFI::mServerPort=5080;
 
 
 //node
-uint32_t WIFI::mNodePort=345;
+uint32_t WIFI::mNodePort=456;
 	
 /********************************************************/
 
 bool WIFI::Init(esp8266 &wifi)
 {
-	if(!wifi.kick())//检测是否存在
+	/*if(!wifi.kick())//检测是否存在
 		return false;
-
+*/
+	wifi.leaveAP();
 	wifi.setEcho(1);//关闭回显
+	wifi.leaveAP();
 	wifi.setOprToStationSoftAP(1,1);//设置为AP+station模式
 	wifi.setStationMac((char*)mStationMac,1);//set station mac adress
 	if(!wifi.joinAP(mJoinApName,mJoinApPassword,1))//join ap
 	{
 		
 	}
+	//TaskManager::DelayS(18);
 	wifi.setSoftAPParam(mSoftApName,mSoftApPassword,5,3,1);//set station param
 //	wifi.setStationIp(mSoftApIP,mSoftApGateway,mSoftApNetmask,1);//set station's address (AP mode)
 //	wifi.setAPIp();
