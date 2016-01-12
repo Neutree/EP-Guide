@@ -94,7 +94,7 @@ void APP::Loop()
 
 	timeNew=TaskManager::Time();
 	
-	//RFID 健康状况,器件存在问题时不会执行--②--
+/*	//RFID 健康状况,器件存在问题时不会执行--②--
 	if(!mRFID.mHealth)
 	{
 		static double timeOld=TaskManager::Time();
@@ -154,14 +154,14 @@ void APP::Loop()
 		return;
 	}
 	haveWrong=false;
-
+*/
 /*******************************************************************************/
 
 	
 /****************************--②--车辆检测**************************************/
 
 /*******************************************************************************/
-	FindCar();
+//	FindCar();
 
 /*********************--③--接收到的信息处理（取出完整的有效数据帧）***************/
 	
@@ -173,7 +173,7 @@ void APP::Loop()
 
 
 /*************************--④--链路保持（心跳包），周期为30秒********************/
-static uint32_t heartBeatTimeOld=0;
+/*static uint32_t heartBeatTimeOld=0;
 
 //时间到发送链路请求
 if(timeNew-heartBeatTimeOld>=mReqLinkCheckInterval)
@@ -182,7 +182,7 @@ if(timeNew-heartBeatTimeOld>=mReqLinkCheckInterval)
 	WaitHeartBeatRequestAck(); //应弃用，可能会导致阻塞
 	heartBeatTimeOld=timeNew;
 }
-
+*/
 /******************************************************************************/
 
 
@@ -194,7 +194,7 @@ static double timeOld=TaskManager::Time();
 if(timeNew-timeOld>10)
 {
 	timeOld=timeNew;
-/*//测试
+//测试
 	static bool a=true;
 	mMacBuffer[0][0]=0x12;
 				mMacBuffer[0][1]=0x08;
@@ -214,7 +214,7 @@ if(timeNew-timeOld>10)
 		else
 			mCOM1<<"del ffffc\r\n";
 		a=a?false:true;
-*/
+
 		
 //	uint8_t status = QueryNodeStatus(cardId,macAddr,ipAddr);//包含掉线检查
 //	if(status&NodeStatus_On_line)//在线
@@ -655,7 +655,7 @@ bool APP::ReqDelNode(unsigned char macAddress[6])
 	//获取响应
 	if(WaitReceiveAndDecode())
 	{
-		if(mBuffer[10]==0&&mBuffer[11]==4&&mBuffer[12]==(TO_SERVER_cAckNodeDel>>8)&&(mBuffer[13]==(u8)TO_SERVER_cAckNodeDel)&&mBuffer[14]==0)
+		if(mBuffer[10]==0&&mBuffer[11]==2&&mBuffer[12]==(TO_SERVER_cAckNodeDel>>8)&&(mBuffer[13]==(u8)TO_SERVER_cAckNodeDel)&&mBuffer[14]==0)
 		{
 			if(mBuffer[15]==1)//删除成功
 				return true;
