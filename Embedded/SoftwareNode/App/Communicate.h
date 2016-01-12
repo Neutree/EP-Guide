@@ -40,6 +40,9 @@
 #define To_NODE_cAckLead                0x0902    //节点响应主控道路引导请求
 #define To_NODE_cReqCompleteLead        0x0203    //主控向节点请求道路引导
 #define To_NODE_cAckCompletLead         0x0903    //节点响应主控道路引导请求
+#define To_NODE_cReqDisable             0x0204    //主控向节点请求禁用节点
+#define To_NODE_cAckDisable             0x0904    //节点响应主控禁用节点请求
+
 
 class Communicate
 {
@@ -56,6 +59,14 @@ class Communicate
 		////////////////////////////
 		static bool SendBytesToServer(esp8266 & wifi,char* ipAddress,uint32_t port,char* data,uint32_t len);
 	
+		////////////////////////////
+		///发送一个字节到服务器
+		///@param wifi wifi对象
+		///@param linkID 连接ID号0~4
+		///@param data 需要发送的一个字节的数据
+		///@param 是否发送成功（对方不一定接收到，只是发送成功）
+		////////////////////////////
+		static bool ReturnBytesToClient(esp8266 & wifi,uint8_t linkID,char* data,uint32_t len);
 	
 		//////////////////////////////
 		///发送http请求到服务器

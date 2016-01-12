@@ -249,7 +249,7 @@ void APP::HeartBeatRequest()
 	uint16_t temp=Communicate::ToServerGenerateMessageID();
 	Communicate::mCommunicatePack[2]=temp>>8;//消息ID高字节
 	Communicate::mCommunicatePack[3]=temp&0x00ff;//消息ID低字节
-	char mac[6]={1,2,3,4,5,6};
+	unsigned char mac[6]={1,2,3,4,5,6};
 	WIFI::MacAddressStringToBytes((char*)WIFI::mStationMac,mac);
 	memcpy(&Communicate::mCommunicatePack[4],mac,6);//复制mac地址
 	Communicate::mCommunicatePack[10]=0;//消息体长度：0
@@ -633,7 +633,7 @@ bool APP::ReqShorestLead(unsigned char macAddress[][6],uint16_t* number)
 	uint16_t temp=Communicate::ToServerGenerateMessageID();
 	Communicate::mCommunicatePack[2]=temp>>8;//消息ID高字节
 	Communicate::mCommunicatePack[3]=temp&0x00ff;//消息ID低字节
-	char mac[6]={0,0,0,0,0,0};
+	unsigned char mac[6]={0,0,0,0,0,0};
 	WIFI::MacAddressStringToBytes((char*)WIFI::mStationMac,mac);
 	memcpy(&Communicate::mCommunicatePack[4],mac,6);//复制主控mac地址
 	Communicate::mCommunicatePack[10]=(mAllNodeInfo.number*8+2)>>8;//消息体长度高位：0

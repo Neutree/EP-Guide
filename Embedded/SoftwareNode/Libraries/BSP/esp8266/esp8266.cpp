@@ -307,7 +307,7 @@
 						mUsart<<"AT+CWJAP=";
 		}
 		mUsart<<"\""<<ssid<<"\",\""<<pwd<<"\"\r\n";
-		data_temp = recvString("OK", "ERROR");
+		data_temp = recvString("OK", "ERROR",10);
 		if(strstr(data_temp,"OK"))
 			return true;
 		else//strstr(ssid,"FAIL")
@@ -328,7 +328,7 @@
 	{
 		char *data_temp;
 		rx_empty();
-		mUsart<<"AT+CWQAP";		
+		mUsart<<"AT+CWQAP\r\n";		
 		data_temp = recvString("OK");
 		if(strstr(data_temp,"OK"))
 			return true;
@@ -1036,7 +1036,7 @@
 		qATCIPSTA(&ip,pattern);
 		if(ip!=0)
 			recvFindAndFilter("gateway", "ip:\"", "\"+CIPSTA:gateway", &ip);
-		
+			
 		return ip;
 	 }
      
