@@ -307,7 +307,7 @@
 						mUsart<<"AT+CWJAP=";
 		}
 		mUsart<<"\""<<ssid<<"\",\""<<pwd<<"\"\r\n";
-		data_temp = recvString("OK", "ERROR");
+		data_temp = recvString("OK", "ERROR",10);
 		if(strstr(data_temp,"OK"))
 			return true;
 		else//strstr(ssid,"FAIL")

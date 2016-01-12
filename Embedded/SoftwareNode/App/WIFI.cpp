@@ -11,16 +11,16 @@ uint32_t WIFI::mSoftApPort=345;
 uint16_t WIFI::mSoftApClientTimeOut=180;//s
 
 //Station
-char WIFI::mJoinApName[13]="nomore";
-char WIFI::mJoinApPassword[20]="morenimei0";
-//char WIFI::mJoinApName[13]="EP-Guide";
-//char WIFI::mJoinApPassword[20]="1208077207";
+//char WIFI::mJoinApName[13]="nomore";
+//char WIFI::mJoinApPassword[20]="morenimei0";
+char WIFI::mJoinApName[13]="EP-Guide";
+char WIFI::mJoinApPassword[20]="1208077207";
 //char WIFI::mJoinApName[13]="ICanHearYou";
 //char WIFI::mJoinApPassword[20]="1208077207";
 unsigned char WIFI::mStationMac[18]="12:08:07:72:07:02";
 
 //server
-char WIFI::mServerIPOrDomain[30]="192.168.191.7";
+char WIFI::mServerIPOrDomain[30]="192.168.4.1";
 uint32_t WIFI::mServerPort=345;
 
 
