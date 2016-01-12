@@ -194,7 +194,6 @@ static double timeOld=TaskManager::Time();
 if(timeNew-timeOld>10)
 {
 	timeOld=timeNew;
-	NodeStatus status = QueryNodeStatus(cardId,macAddr,ipAddr);//包含掉线检查
 /*//测试
 	static bool a=true;
 	mMacBuffer[0][0]=0x12;
