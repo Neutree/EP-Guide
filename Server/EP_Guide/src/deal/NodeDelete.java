@@ -8,7 +8,7 @@ import tool.DataTransform;
 
 public class NodeDelete {
 	/**
-	 * 心跳包
+	 * 节点删除
 	 * 
 	 * @param msgBean
 	 * @return
@@ -17,7 +17,7 @@ public class NodeDelete {
 		byte[] bMsgBody = DeleteNode.delete(msgBean.getbMsgBody());// 获取要返回的消息体内容
 		byte[] gMsgLen = DataTransform.intToByteGroup(bMsgBody.length, 2);// 消息体长度
 
-		msgBean.setbMsgCmd(DataTransform.intToByteGroup(ConstantCode.cAckLinkCheck, 2));
+		msgBean.setbMsgCmd(DataTransform.intToByteGroup(ConstantCode.cAckNodeDel, 2));
 		msgBean.setgMsgLen(gMsgLen);
 		msgBean.setbMsgBody(bMsgBody);
 		msgBean.setbMsgVrf(DataTransform

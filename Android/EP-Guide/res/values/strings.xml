@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">EP-Guide</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_login">Login</string>
+    <string name="title_activity_regist">RegistActivity</string>
+    <string name="title_activity_login_suc">登录成功</string>
+    <string name="title_activity_order_park">预约停车</string>
+    <string name="title_activity_query_history">查询历史记录</string>
+    <string name="title_activity_carport">预约车位</string>
+    <string name="title_activity_http_show">HttpShowActivity</string>
+
+</resources>

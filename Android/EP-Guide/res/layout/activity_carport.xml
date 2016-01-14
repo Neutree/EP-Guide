@@ -1,0 +1,68 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg"
+    tools:context=".CarportActivity" >
+
+    <EditText
+        android:id="@+id/garage_ID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="118dp"
+        android:background="@drawable/register_edittext_style"
+        android:ems="10"
+        android:hint="车库号"
+        android:singleLine="true" >
+
+        <requestFocus />
+    </EditText>
+
+    <Button
+        android:id="@+id/Order"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/pSpaceID"
+        android:layout_below="@+id/pSpaceID"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/signup_style"
+        android:ems="10"
+        android:text="预约" />
+
+    <EditText
+        android:id="@+id/pSpaceID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/newCarID"
+        android:layout_below="@+id/newCarID"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/register_edittext_style"
+        android:ems="10"
+        android:hint="车位号"
+        android:singleLine="true" />
+
+    <EditText
+        android:id="@+id/newCarID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/garage_ID"
+        android:layout_below="@+id/garage_ID"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/register_edittext_style"
+        android:ems="10"
+        android:hint="车牌号"
+        android:singleLine="true" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/garage_ID"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="46dp"
+        android:layout_marginLeft="18dp"
+        android:text="请输入您要预约的车位：" />
+
+</RelativeLayout>

@@ -1,0 +1,67 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg"
+    tools:context=".RegisterActivity" >
+
+    <Button
+        android:id="@+id/signUp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/UserID"
+        android:layout_below="@+id/UserID"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/signup_style"
+        android:ems="10"
+        android:text="Sign Up" />
+
+    <EditText
+        android:id="@+id/newCarID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/nickName"
+        android:layout_below="@+id/nickName"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/register_edittext_style"
+        android:ems="10"
+        android:hint="Car ID"
+        android:singleLine="true" />
+
+    <EditText
+        android:id="@+id/newPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/newCarID"
+        android:layout_below="@+id/newCarID"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/register_edittext_style"
+        android:ems="10"
+        android:hint="Password"
+        android:singleLine="true" />
+
+    <EditText
+        android:id="@+id/UserID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/newPassword"
+        android:layout_below="@+id/newPassword"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/register_edittext_style"
+        android:ems="10"
+        android:hint="User ID"
+        android:singleLine="true" />
+
+    <EditText
+        android:id="@+id/nickName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="91dp"
+        android:background="@drawable/register_edittext_style"
+        android:ems="10"
+        android:hint="Username"
+        android:singleLine="true" />
+
+</RelativeLayout>

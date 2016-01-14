@@ -1,6 +1,7 @@
 package dao;
 
 import constant.ConstantCode;
+import request.SendParkStatus;
 import tool.DataTransform;
 
 public class UpdateNodeStatus {
@@ -21,23 +22,29 @@ public class UpdateNodeStatus {
 		DBHelper db = new DBHelper();
 		String sqlexcu = null;
 		byte[] result = ConstantCode.Failed;
+		int status = DataTransform.byteGroupToInt(nodeStatus);
 
 		// -- 数据库操作--//
 		try {
-			long start_time = System.currentTimeMillis();
+			String start_time = DataTransform.timeStamp();
 			sqlexcu = "UPDATE parking_spaces SET user_ID=?,status=?,start_time=? WHERE garage_ID=? And pSpace_ID=?";
 			db.preState = db.con.prepareStatement(sqlexcu);
 			db.preState.setString(1, DataTransform.bytesToString(userID));
 			db.preState.setInt(2, DataTransform.byteGroupToInt(nodeStatus));
-			db.preState.setLong(3, start_time);
+			db.preState.setString(3, start_time);
 			db.preState.setInt(4, 1);// 默认1号车库
 			db.preState.setString(5, DataTransform.bytesToString(nodeID));
 			int orptRow = db.preState.executeUpdate();
 			if (orptRow > 0) {
 				result = ConstantCode.Succeed;
-				System.out.println("Info , 更改车位状态成功 ，车位ID：" +  DataTransform.bytesToString(nodeID));
+				if (status == 0) {
+					SendParkStatus.Send("0", DataTransform.bytesToString(nodeID));
+				} else if (status == 1) {
+					SendParkStatus.Send("1", DataTransform.bytesToString(nodeID));
+				}
+				System.out.println("Info , 更改车位状态成功 ，车位ID：" + DataTransform.bytesToString(nodeID));
 			} else {
-				System.out.println("Info , 更改车位状态车位失败 ，车位ID：" +  DataTransform.bytesToString(nodeID));
+				System.out.println("Info , 更改车位状态车位失败 ，车位ID：" + DataTransform.bytesToString(nodeID));
 			}
 
 		} catch (Exception e) {

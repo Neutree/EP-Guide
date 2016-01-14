@@ -26,14 +26,15 @@ public class InsertNode {
 
 		for (int i = 0; i < nodeList.size(); i++) {
 			try {
-				sqlexcu = "Insert Into paring_spaces (pSpace_ID,garage_ID) Values(?,?)";
+				sqlexcu = "Insert Into parking_spaces (pSpace_ID,garage_ID) Values(?,?)";
 				db.preState = db.con.prepareStatement(sqlexcu);
 				db.preState.setString(1, nodeList.get(i));
 				db.preState.setString(2, "1");// 默认1号库
 				int isSucs = db.preState.executeUpdate();
 				if (isSucs > 0) {
-					result = ConstantCode.Succeed;
+					result = new byte[] { 0x00, 0x01, 0x00, 0x00 };
 				}
+				System.out.println("增加节点成功 ：" + nodeList.get(i));
 			} catch (Exception e) {
 				// TODO: handle exception
 				System.out.println("Abnormal , DB : 节点添加时插入数据库异常： ");

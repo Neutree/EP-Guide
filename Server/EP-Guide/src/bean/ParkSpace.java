@@ -6,13 +6,13 @@ public class ParkSpace {
 	private String park_spaceName;
 	private String garage_ID;
 	private String status;
-	private long start_time;
+	private String start_time;
 	
 	public ParkSpace(){
 		
 	}
 	
-	public ParkSpace(String ID,String park_ID, String park_spaceName, String garage_ID, String status, long start_time) {
+	public ParkSpace(String ID,String park_ID, String park_spaceName, String garage_ID, String status, String start_time) {
 		super();
 		this.ID=ID;
 		this.park_ID = park_ID;
@@ -54,11 +54,11 @@ public class ParkSpace {
 		this.status = status;
 	}
 
-	public long getStart_time() {
+	public String getStart_time() {
 		return start_time;
 	}
 
-	public void setStart_time(long start_time) {
+	public void setStart_time(String start_time) {
 		this.start_time = start_time;
 	}
 

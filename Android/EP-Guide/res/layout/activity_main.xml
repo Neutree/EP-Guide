@@ -1,0 +1,112 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg"
+    tools:context=".MainActivity" >
+
+    <ImageView
+        android:id="@+id/unImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/Account"
+        android:layout_alignLeft="@+id/Account"
+        android:layout_alignTop="@+id/Account"
+        android:src="@drawable/email" />
+
+    <ImageView
+        android:id="@+id/pwImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/Password"
+        android:layout_alignLeft="@+id/Password"
+        android:layout_alignTop="@+id/Password"
+        android:src="@drawable/password" />
+
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="1px"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="60dp"
+        android:background="#FFEC8B" />
+
+    <TextView
+        android:id="@+id/signUp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="32dp"
+        android:text="New Here? Sign Up" />
+
+    <TextView
+        android:id="@+id/TextView01"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/unImageView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="49dp"
+        android:textSize="25dp"
+        android:text="Welcome to EP-Guide" />
+
+    <EditText
+        android:id="@+id/Password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:background="@drawable/edittext_style"
+        android:ems="12"
+        android:hint="******"
+        android:password="true"
+        android:singleLine="true"
+        android:textColorHint="#1A1A1A" >
+
+        <requestFocus />
+    </EditText>
+
+    <EditText
+        android:id="@+id/Account"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/pwImageView"
+        android:layout_alignLeft="@+id/pwImageView"
+        android:layout_alignRight="@+id/Password"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/edittext_style"
+        android:ems="12"
+        android:hint="Username"
+        android:singleLine="true"
+        android:textColorHint="#1A1A1A" />
+
+    <Button
+        android:id="@+id/signIn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/signUp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp"
+        android:background="@drawable/signin_style"
+        android:ems="10"
+        android:text="Sign in" />
+
+    <CheckBox
+        android:id="@+id/checkbox_save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/signIn"
+        android:layout_marginBottom="14dp"
+        android:layout_toLeftOf="@+id/signUp"
+        android:checked="true" />
+
+    <TextView
+        android:id="@+id/textview_save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/checkbox_save"
+        android:layout_alignBottom="@+id/checkbox_save"
+        android:layout_centerHorizontal="true"
+        android:text="Remember the key" />
+
+</RelativeLayout>
