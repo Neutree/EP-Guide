@@ -137,7 +137,7 @@ void FindCar();
 ///@param 车位的mac地址
 ///@retval 节点状态 
 ///////////////////////////////////////
-NodeStatus QueryNodeStatus(unsigned char carID[4],unsigned char macAddress[6],unsigned char ipAddress[4]);
+uint8_t QueryNodeStatus(unsigned char carID[4],unsigned char macAddress[6],unsigned char ipAddress[4]);
 
 /////////////////////////////////////////
 ///向节点请求道路引导
