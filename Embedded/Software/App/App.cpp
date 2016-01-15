@@ -94,7 +94,7 @@ void APP::Loop()
 
 	timeNew=TaskManager::Time();
 	
-/*	//RFID 健康状况,器件存在问题时不会执行--②--
+	//RFID 健康状况,器件存在问题时不会执行--②--
 	if(!mRFID.mHealth)
 	{
 		static double timeOld=TaskManager::Time();
@@ -154,14 +154,14 @@ void APP::Loop()
 		return;
 	}
 	haveWrong=false;
-*/
+
 /*******************************************************************************/
 
 	
 /****************************--②--车辆检测**************************************/
 
 /*******************************************************************************/
-//	FindCar();
+	FindCar();
 
 /*********************--③--接收到的信息处理（取出完整的有效数据帧）***************/
 	
@@ -173,7 +173,7 @@ void APP::Loop()
 
 
 /*************************--④--链路保持（心跳包），周期为30秒********************/
-/*static uint32_t heartBeatTimeOld=0;
+static uint32_t heartBeatTimeOld=0;
 
 //时间到发送链路请求
 if(timeNew-heartBeatTimeOld>=mReqLinkCheckInterval)
@@ -182,7 +182,7 @@ if(timeNew-heartBeatTimeOld>=mReqLinkCheckInterval)
 	WaitHeartBeatRequestAck(); //应弃用，可能会导致阻塞
 	heartBeatTimeOld=timeNew;
 }
-*/
+
 /******************************************************************************/
 
 
@@ -195,7 +195,7 @@ if(timeNew-timeOld>10)
 {
 	timeOld=timeNew;
 //测试
-	static bool a=true;
+/*	static bool a=true;
 	mMacBuffer[0][0]=0x12;
 				mMacBuffer[0][1]=0x08;
 				mMacBuffer[0][2]=0x07;
@@ -215,66 +215,66 @@ if(timeNew-timeOld>10)
 			mCOM1<<"del ffffc\r\n";
 		a=a?false:true;
 
-		
-//	uint8_t status = QueryNodeStatus(cardId,macAddr,ipAddr);//包含掉线检查
-//	if(status&NodeStatus_On_line)//在线
-//	{
+	*/	
+	uint8_t status = QueryNodeStatus(cardId,macAddr,ipAddr);//包含掉线检查
+	if(status&NodeStatus_On_line)//在线
+	{
 //		mCOM1<<"have node\r\n";
-//		if(RoleStatus(macAddr)==0)//新的节点，发送新的节点请求
-//		{
+		if(RoleStatus(macAddr)==0)//新的节点，发送新的节点请求
+		{
 //			mCOM1<<"\r\nit is New\r\n";
-//			int8_t status=/*ReqAddNewNode(macAddr)*/0;
-//			if(status==0)//请求添加成功,添加到节点信息中
-//			{
-////				mLedRed.Blink(2,200);
+			int8_t status=/*ReqAddNewNode(macAddr)*/0;
+			if(status==0)//请求添加成功,添加到节点信息中
+			{
+//				mLedRed.Blink(2,200);
 //				mCOM1<<"\r\nadd success\r\n";
-//				memcpy(mAllNodeInfo.nodeInfo[mAllNodeInfo.number].ipAddress,ipAddr,4);
-//				memcpy(mAllNodeInfo.nodeInfo[mAllNodeInfo.number].macAdress,macAddr,6);
-//				mAllNodeInfo.nodeInfo[mAllNodeInfo.number].status=NodeStatus_Free;
-//				mAllNodeInfo.number+=1;
-//			}
-//			else if(status==-2)//请求被拒绝,向节点发送禁用请求，让节点在下次上电前都不再发送注册信息
-//			{
-////				mLedRed.Blink(4,200);
-//				mCOM1<<"\n\nadd refuse\n\n";/*
-//				if(ReqDisableNode(macAddr,ipAddr))
-//				{
-//				}
-//					*/
-//			}
-//			else if(status==-1)
-//			{
+				memcpy(mAllNodeInfo.nodeInfo[mAllNodeInfo.number].ipAddress,ipAddr,4);
+				memcpy(mAllNodeInfo.nodeInfo[mAllNodeInfo.number].macAdress,macAddr,6);
+				mAllNodeInfo.nodeInfo[mAllNodeInfo.number].status=NodeStatus_Free;
+				mAllNodeInfo.number+=1;
+			}
+			else if(status==-2)//请求被拒绝,向节点发送禁用请求，让节点在下次上电前都不再发送注册信息
+			{
+//				mLedRed.Blink(4,200);
+//				mCOM1<<"\n\nadd refuse\n\n";
+				if(ReqDisableNode(macAddr,ipAddr))
+				{
+				}
+					
+			}
+			else if(status==-1)
+			{
 //				mCOM1<<"\n\nadd fail\n\n";
-////				mLedRed.Blink(6,200);
-//			}
-//		}
-//		else//不是新节点
-//		{
+//				mLedRed.Blink(6,200);
+			}
+		}
+		else//不是新节点
+		{
 //			mCOM1<<"\r\nnot New\r\n";
-//			if(status & (NodeStatus_ToFree|NodeStatus_ToBusy))//车位状态更改,向服务器发送状态 更改请求
-//			{
-//				/*ReqChangeStatus(macAddr,(NodeStatus)(status&(NodeStatus_ToFree|NodeStatus_ToBusy)),cardId);*/
-//				if((status&NodeStatus_ToBusy) && mIsleadNow)//是刚刚引导的车辆入库
-//				{
-//					//向节点发送请求，完成引导，关闭引导提示
-//					ReqCompleteLead(mMacBuffer,mLeadNumber);
-//					mIsleadNow=false;
-//				}
-//				if(status&NodeStatus_ToBusy)
-//					mAllNodeInfo.nodeInfo[IndexOfMacAddress(macAddr)].status=NodeStatus_Busy;
-//				else if(status&NodeStatus_ToFree)
-//					mAllNodeInfo.nodeInfo[IndexOfMacAddress(macAddr)].status=NodeStatus_Free;
-//			}
-//			else if(status&NodeStatus_Free)//车位状态依然为空闲
-//			{
-//				mAllNodeInfo.nodeInfo[IndexOfMacAddress(macAddr)].status=NodeStatus_Free;
-//			}
-//			else if(status&NodeStatus_Busy)//车位状态依然为忙
-//			{
-//				mAllNodeInfo.nodeInfo[IndexOfMacAddress(macAddr)].status=NodeStatus_Busy;
-//			}
-//		}
-//	}
+			if(status & (NodeStatus_ToFree|NodeStatus_ToBusy))//车位状态更改,向服务器发送状态 更改请求
+			{
+				/*ReqChangeStatus(macAddr,(NodeStatus)(status&(NodeStatus_ToFree|NodeStatus_ToBusy)),cardId);*/
+				if((status&NodeStatus_ToBusy) && mIsleadNow)//是刚刚引导的车辆入库
+				{
+					//向节点发送请求，完成引导，关闭引导提示
+					ReqCompleteLead(mMacBuffer,mLeadNumber);
+					mIsleadNow=false;
+				}
+				if(status&NodeStatus_ToBusy)
+					mAllNodeInfo.nodeInfo[IndexOfMacAddress(macAddr)].status=NodeStatus_Busy;
+				else if(status&NodeStatus_ToFree)
+					mAllNodeInfo.nodeInfo[IndexOfMacAddress(macAddr)].status=NodeStatus_Free;
+			}
+			else if(status&NodeStatus_Free)//车位状态依然为空闲
+			{
+				mAllNodeInfo.nodeInfo[IndexOfMacAddress(macAddr)].status=NodeStatus_Free;
+			}
+			else if(status&NodeStatus_Busy)//车位状态依然为忙
+			{
+				mAllNodeInfo.nodeInfo[IndexOfMacAddress(macAddr)].status=NodeStatus_Busy;
+			}
+		}
+	}
 //	else
 //		mCOM1<<"No Node2\r\n\r\n";
 
@@ -726,7 +726,7 @@ bool APP::ReqShorestLead(unsigned char macAddress[][6],uint16_t* number)
 ///@param 车位的mac地址
 ///@retval 节点状态 
 ///////////////////////////////////////
-NodeStatus APP::QueryNodeStatus(unsigned char carID[4],unsigned char macAddress[6],unsigned char ipAddress[4])
+uint8_t APP::QueryNodeStatus(unsigned char carID[4],unsigned char macAddress[6],unsigned char ipAddress[4])
 {
 	static uint8_t queryNodeCount=0,NodeNumber=0;
 	if(queryNodeCount==0)

@@ -510,7 +510,7 @@ bool MFRC522::PcdHalt(void)
 
 bool MFRC522::Kick()
 {
-	char temp=0,temp2=0;
+	uint8_t temp=0,temp2=0;
 	temp = ReadRawRC(MFRC522_VersionReg);
 	temp2 = ReadRawRC(MFRC522_VersionReg);
 	if( (!temp&&!temp2) || (temp!=temp2) ||temp<140)//两次读到的不相等，即不稳定，或者都为零
