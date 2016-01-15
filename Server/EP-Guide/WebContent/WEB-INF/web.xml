@@ -3,7 +3,7 @@
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:web="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
   <servlet>
     <servlet-name>HandleRegister</servlet-name>
-    <servlet-class>control.Register</servlet-class>
+    <servlet-class>client.Register</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>HandleRegister</servlet-name>
@@ -71,6 +71,15 @@
   <servlet-mapping>
     <servlet-name>HandleHeartBeat</servlet-name>
     <url-pattern>/heartBeat</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>HandleParkMove</servlet-name>
+    <servlet-class>localreq.ParkMove</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HandleParkMove</servlet-name>
+    <url-pattern>/parkMove</url-pattern>
   </servlet-mapping>
   
 </web-app>

@@ -7,6 +7,7 @@ import java.util.List;
 import bean.ParkHistory;
 import bean.ParkSpace;
 import constant.ConstantCode;
+import tools.Data2TimeStamp;
 import tools.Encrypt;
 
 public class DBOpreate {
@@ -106,7 +107,7 @@ public class DBOpreate {
 		return db_token;
 	}
 
-	public static String register(String username, String password, String car_ID,String user_ID) {
+	public static String register(String username, String password, String car_ID, String user_ID) {
 		String token = null;
 		String sqlexcu = null;
 		DBHelper db = new DBHelper();
@@ -121,8 +122,9 @@ public class DBOpreate {
 			if (!rs.next()) {
 				// 说明rs查询到的数据是空,没有注册过
 				System.out.println("car_ID2:" + car_ID);
-				sqlexcu = "Insert Into user (userName,password,token,car_ID，user_ID) Values(?,?,?,?,?)";
+				sqlexcu = "Insert Into user (userName,password,token,car_ID,user_ID) Values(?,?,?,?,?)";
 				token = Encrypt.md5(username + System.currentTimeMillis());// token为用户名与登录时间Md5加密后的值
+				password = Encrypt.encode_sha1(password);
 				db.preState = db.con.prepareStatement(sqlexcu);
 				db.preState.setString(1, username);
 				db.preState.setString(2, password);
@@ -130,6 +132,7 @@ public class DBOpreate {
 				db.preState.setString(4, car_ID);
 				db.preState.setString(5, user_ID);
 				db.preState.execute();
+				System.out.println("注册成功");
 			} else {
 				return "7002";// 说明已经注册
 			}
@@ -209,7 +212,8 @@ public class DBOpreate {
 				String park_spaceName = rs.getString(3);
 				String garage_ID = rs.getString(4);
 				String status = rs.getString(5);
-				long start_time = rs.getLong(6);
+				String start_time = rs.getString(6);
+				start_time = Data2TimeStamp.timeStamp2Date(start_time, "yyyy-MM-dd HH:mm:ss");
 				ParkSpace pSpace = new ParkSpace(ID, park_ID, park_spaceName, garage_ID, status, start_time);
 				pSpaces.add(pSpace);
 				System.out.println("Info , 查询车库车位信息成功 ， pSpace = " + pSpace.toString());
@@ -219,7 +223,8 @@ public class DBOpreate {
 					park_spaceName = rs.getString(3);
 					garage_ID = rs.getString(4);
 					status = rs.getString(5);
-					start_time = rs.getLong(6);
+					start_time = rs.getString(6);
+					start_time = Data2TimeStamp.timeStamp2Date(start_time, "yyyy-MM-dd HH:mm:ss");
 					pSpace = new ParkSpace(ID, park_ID, park_spaceName, garage_ID, status, start_time);
 					pSpaces.add(pSpace);
 					System.out.println("Info , 查询车库车位信息成功 ， pSpace = " + pSpace.toString());
@@ -299,13 +304,13 @@ public class DBOpreate {
 		// -- 更改车位状态 --//
 		try {
 			int isOrder = 1, status = 1;
-			long start_time = System.currentTimeMillis();
+			String start_time = Data2TimeStamp.timeStamp();
 			sqlexcu = "UPDATE parking_spaces SET car_ID=?,status=?,isOrder=?,start_time=? WHERE garage_ID=? And pSpace_ID=?";
 			db.preState = db.con.prepareStatement(sqlexcu);
 			db.preState.setString(1, car_ID);
 			db.preState.setInt(2, status);
 			db.preState.setInt(3, isOrder);
-			db.preState.setLong(4, start_time);
+			db.preState.setString(4, start_time);
 			db.preState.setInt(5, garage_ID);
 			db.preState.setString(6, pSpace_ID);
 			int orptRow = db.preState.executeUpdate();
@@ -379,8 +384,10 @@ public class DBOpreate {
 				String carID = rs.getString(2);
 				String pSpace_ID = rs.getString(3);
 				String garage_ID = rs.getString(4);
-				long getIn_time = rs.getLong(5);
-				long park_time = rs.getLong(6);
+				String getIn_time = rs.getString(5);
+				String park_time = rs.getString(6);
+				getIn_time = Data2TimeStamp.timeStamp2Date(getIn_time, "yyyy-MM-dd HH:mm:ss");
+				park_time = Data2TimeStamp.timeStamp2Date(park_time, "yyyy-MM-dd HH:mm:ss");
 				ParkHistory parked = new ParkHistory(carID, pSpace_ID, garage_ID, getIn_time, park_time);
 				parkHistories.add(parked);
 				System.out.println("Info , 查询车库车位信息成功 ， parked = " + parked.toString());
@@ -388,8 +395,10 @@ public class DBOpreate {
 					carID = rs.getString(2);
 					pSpace_ID = rs.getString(3);
 					garage_ID = rs.getString(4);
-					getIn_time = rs.getLong(5);
-					park_time = rs.getLong(6);
+					getIn_time = rs.getString(5);
+					park_time = rs.getString(6);
+					getIn_time = Data2TimeStamp.timeStamp2Date(getIn_time, "yyyy-MM-dd HH:mm:ss");
+					park_time = Data2TimeStamp.timeStamp2Date(park_time, "yyyy-MM-dd HH:mm:ss");
 					parked = new ParkHistory(carID, pSpace_ID, garage_ID, getIn_time, park_time);
 					parkHistories.add(parked);
 					System.out.println("Info , 查询车库车位信息成功 ， parked = " + parked.toString());

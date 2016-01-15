@@ -4,14 +4,14 @@ public class ParkHistory {
 	private  String car_ID;
 	private  String pSpace_ID;
 	private  String garage_ID;
-	private  long getIn_time;
-	private  long park_time;
+	private  String getIn_time;
+	private  String park_time;
 	
 	public ParkHistory() {
 		super();
 	}
 
-	public ParkHistory(String car_ID, String pSpace_ID, String garage_ID, long getIn_time, long park_time) {
+	public ParkHistory(String car_ID, String pSpace_ID, String garage_ID, String getIn_time, String park_time) {
 		super();
 		this.car_ID = car_ID;
 		this.pSpace_ID = pSpace_ID;
@@ -44,19 +44,19 @@ public class ParkHistory {
 		this.garage_ID = garage_ID;
 	}
 
-	public long getGetIn_time() {
+	public String getGetIn_time() {
 		return getIn_time;
 	}
 
-	public void setGetIn_time(long getIn_time) {
+	public void setGetIn_time(String getIn_time) {
 		this.getIn_time = getIn_time;
 	}
 
-	public long getPark_time() {
+	public String getPark_time() {
 		return park_time;
 	}
 
-	public void setPark_time(long park_time) {
+	public void setPark_time(String park_time) {
 		this.park_time = park_time;
 	}
 
