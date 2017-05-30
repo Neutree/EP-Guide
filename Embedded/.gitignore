@@ -31,5 +31,7 @@ JLinkSettings.ini
 *.uvoptx
 *.*.bak
 
+DebugConfig
+
 
 ProjectTemplate

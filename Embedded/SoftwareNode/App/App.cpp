@@ -111,13 +111,13 @@ void APP::Loop()
 	}
 	
 	
-	//WIFI健康状况检查
-	if(mWIFI.mHealth!=0)//WIFI 存在问题
-	{
-		mWIFI.kick();//检测是否恢复连接
-		haveWrong=true;
-		return ;
-	}
+//	//WIFI健康状况检查
+//	if(mWIFI.mHealth!=0)//WIFI 存在问题
+//	{
+//		mWIFI.kick();//检测是否恢复连接
+//		haveWrong=true;
+//		return ;
+//	}
 /*******************************************************************************/
 	
 
@@ -135,65 +135,65 @@ void APP::Loop()
 	
 
 /*********************--③--接收到的信息处理（取出完整的有效数据帧并处理）***************/
-	
-if(mCOM1.ReceiveBufferSize()>=25)//接收到的数据大于一帧数据最小长度
-{
-	if(WaitReceiveAndDecode())//成功接收到一帧完整的数据，进行命令判断
-	{
-			
+//	
+//if(mCOM1.ReceiveBufferSize()>=25)//接收到的数据大于一帧数据最小长度
+//{
+//	if(WaitReceiveAndDecode())//成功接收到一帧完整的数据，进行命令判断
+//	{
+//			
 
-		if(mBuffer[20]==0&& mBuffer[11]==0)
-		{
-			
-			//完成引导道路请求
-			if(mBuffer[12]==(To_NODE_cReqCompleteLead>>8) && mBuffer[13]==((uint8_t)To_NODE_cReqCompleteLead))
-			{
-				AckCompleteLead();
-				mIsleadNow=false;   //引导标识复位
-			}
-			//禁用节点请求
-			else if(mBuffer[12]==(To_NODE_cReqDisable>>8) && mBuffer[13]==((uint8_t)To_NODE_cReqDisable))
-			{
-				AckDisableNode();
-				mWIFI.leaveAP();//断开连接
-			}
-		}
-		else if(mBuffer[20]==0&& mBuffer[11]==1)
-		{
-			//状态获取请求
-			if(mBuffer[12]==(To_NODE_cReqStatus>>8) && mBuffer[13]==((uint8_t)To_NODE_cReqStatus))
-			{
-				//发送给主控的状态是实际状态，获取是否被预约是为了根据是否被预约来控制提示灯！！！！！！！！！！！！！
-				mLedGreen.Blink(2,100);
-				if(mBuffer[14]==1)//车位被预约了
-					mIsreserved=true;
-				else              //车位没被预约
-					mIsreserved=false;
-				
-				if(mIsBusyToFree)
-					mStatusNow=NodeStatus_ToFree;
-				else if(mIsFreeToBusy)
-					mStatusNow=NodeStatus_ToBusy;
-				else if(mIsExistCar)
-					mStatusNow=NodeStatus_Busy;
-				else
-					mStatusNow=NodeStatus_Free;
-				AckStatus();
-				
-			}
-			//引导命令
-			else if(mBuffer[12]==(To_NODE_cReqLead>>8) && mBuffer[13]==((uint8_t)To_NODE_cReqLead))
-			{
-				AckLead();
-				mIsleadNow=true;  //置位引导标识
-				if(mBuffer[14]==0x11)//终点
-					mIsleadDestination=true;
-				else
-					mIsleadDestination=false;
-			}
-		}
-	}
-}
+//		if(mBuffer[20]==0&& mBuffer[11]==0)
+//		{
+//			
+//			//完成引导道路请求
+//			if(mBuffer[12]==(To_NODE_cReqCompleteLead>>8) && mBuffer[13]==((uint8_t)To_NODE_cReqCompleteLead))
+//			{
+//				AckCompleteLead();
+//				mIsleadNow=false;   //引导标识复位
+//			}
+//			//禁用节点请求
+//			else if(mBuffer[12]==(To_NODE_cReqDisable>>8) && mBuffer[13]==((uint8_t)To_NODE_cReqDisable))
+//			{
+//				AckDisableNode();
+//				mWIFI.leaveAP();//断开连接
+//			}
+//		}
+//		else if(mBuffer[20]==0&& mBuffer[11]==1)
+//		{
+//			//状态获取请求
+//			if(mBuffer[12]==(To_NODE_cReqStatus>>8) && mBuffer[13]==((uint8_t)To_NODE_cReqStatus))
+//			{
+//				//发送给主控的状态是实际状态，获取是否被预约是为了根据是否被预约来控制提示灯！！！！！！！！！！！！！
+//				mLedGreen.Blink(2,100);
+//				if(mBuffer[14]==1)//车位被预约了
+//					mIsreserved=true;
+//				else              //车位没被预约
+//					mIsreserved=false;
+//				
+//				if(mIsBusyToFree)
+//					mStatusNow=NodeStatus_ToFree;
+//				else if(mIsFreeToBusy)
+//					mStatusNow=NodeStatus_ToBusy;
+//				else if(mIsExistCar)
+//					mStatusNow=NodeStatus_Busy;
+//				else
+//					mStatusNow=NodeStatus_Free;
+//				AckStatus();
+//				
+//			}
+//			//引导命令
+//			else if(mBuffer[12]==(To_NODE_cReqLead>>8) && mBuffer[13]==((uint8_t)To_NODE_cReqLead))
+//			{
+//				AckLead();
+//				mIsleadNow=true;  //置位引导标识
+//				if(mBuffer[14]==0x11)//终点
+//					mIsleadDestination=true;
+//				else
+//					mIsleadDestination=false;
+//			}
+//		}
+//	}
+//}
 	
 
 /*******************************************************************************/
@@ -201,43 +201,43 @@ if(mCOM1.ReceiveBufferSize()>=25)//接收到的数据大于一帧数据最小长
 
 /***************************引导指示和车位状态提示********************************************/
 
-if(mIsleadNow)//正在进行引导
-{
-	static bool flag=false;
-	static double timeOld=TaskManager::Time();
-	if(timeNew-timeOld>1)
-	{
-		flag=flag?false:true;
-		if(flag)
-		{
-			if(mIsleadDestination)
-				mLedRed.On();
-			else
-			{
-				mLedGreen.Off();
-				mLedRed.On();
-			}
-		}
-		else
-		{
-			mLedGreen.On();
-			mLedRed.Off();
-		}
-	}
-}
-else//没有进行引导，正常显示车位是否已经被占用，红灯常亮表示占用或者被预约，路灯表示空闲
-{
-	if(mIsreserved || mIsExistCar)//被预约了或者有车
-	{
-		mLedRed.On();
-		mLedGreen.Off();
-	}
-	else
-	{
-		mLedRed.Off();
-		mLedGreen.On();
-	}
-}
+//if(mIsleadNow)//正在进行引导
+//{
+//	static bool flag=false;
+//	static double timeOld=TaskManager::Time();
+//	if(timeNew-timeOld>1)
+//	{
+//		flag=flag?false:true;
+//		if(flag)
+//		{
+//			if(mIsleadDestination)
+//				mLedRed.On();
+//			else
+//			{
+//				mLedGreen.Off();
+//				mLedRed.On();
+//			}
+//		}
+//		else
+//		{
+//			mLedGreen.On();
+//			mLedRed.Off();
+//		}
+//	}
+//}
+//else//没有进行引导，正常显示车位是否已经被占用，红灯常亮表示占用或者被预约，路灯表示空闲
+//{
+//	if(mIsreserved || mIsExistCar)//被预约了或者有车
+//	{
+//		mLedRed.On();
+//		mLedGreen.Off();
+//	}
+//	else
+//	{
+//		mLedRed.Off();
+//		mLedGreen.On();
+//	}
+//}
 
 /*******************************************************************************/
 
@@ -341,6 +341,7 @@ void APP::FindCar()
 	double time=TaskManager::Time();
 	if(mRFID.PcdRequest(MFRC522_PICC_REQIDL,mTagInfo))//寻到卡
 	{
+		mCOM1<<"find card\n";
 		if(((u16)mTagInfo[0]<<8|mTagInfo[1])==MFRC522_PICC_MIFARE_ONE_S50)//卡类型：S50
 		{
 			if(mRFID.PcdAntiColl(mTagInfo))//防冲撞成功(找到一张卡序列号)
