@@ -5,7 +5,8 @@
 
 #define OFFLINE_RETRY_INTERVAL  10  //s
 #define LOGGING_MAX_WAIT_TIME   10  //s
-#define LOGGED_MAX_HEARTBEAT_WAIT_TIME  62 //s
+#define SEND_HEARTBEAT_TIME_INTERVAL    60 //s
+#define LOGGED_MAX_HEARTBEAT_WAIT_TIME  130 //s
 #define MAX_CARD_QUANTITY 10
 #define MAX_CARD_NOT_READ_TIME 3  //s
 
@@ -77,7 +78,7 @@ typedef enum
 	STATUS_OFFLINE=2,
 }status_t;
 status_t status;
-float offline_time,recv_heartbeat_time;
+float offline_time,recv_heartbeat_time,send_heartbeat_time;
 
 /*****************************************************************************/
 
@@ -88,7 +89,7 @@ bool IsCardExist(uint8_t* cardNumber);
 void CardAdd(uint8_t* cardNumber);
 void FlushTimestrap(uint8_t* cardNumber);
 void CardTimeoutCheck();
-void SendCardInfo2Server();
+void SendCardInfo2Server(uint8_t* cardNumber);
 uint8_t CardQuantity();
 
 
@@ -99,7 +100,11 @@ void init()
 	status = STATUS_OFFLINE;
 	offline_time = TaskManager::Time();
 	if(!WiFiInit())
+	{
 		com<<"WiFi init fail\r\n";
+		while(1)
+			ledRed.Blink(0,100,false);
+	}
 	ledRed.Blink(6,100,true);
 	com<<"start log in!\n";
 	conn.Login();
@@ -113,18 +118,11 @@ void init()
 }
 void loop()
 {
-	static double sliceHeartbeat=0;
 	if(status == STATUS_OFFLINE)
 		ledRed.Blink(0,2000,false);
 	else
 		ledRed.Blink(0,500,false);
-	if(tskmgr.TimeSlice(sliceHeartbeat,30))
-	{
-		if(status == STATUS_LOGGED_IN)
-		{
-			conn.LinkCheck();
-		}
-	}
+
 	if(com2.ReceiveBufferSize()>10)
 	{
 		bool success = false;
@@ -192,6 +190,11 @@ void StatusCheck()
 			}
 			break;
 		case STATUS_LOGGED_IN:
+			if(TaskManager::Time()-send_heartbeat_time>SEND_HEARTBEAT_TIME_INTERVAL)
+			{
+					send_heartbeat_time = TaskManager::Time();
+					conn.LinkCheck();
+			}
 			if(TaskManager::Time()-recv_heartbeat_time > LOGGED_MAX_HEARTBEAT_WAIT_TIME)
 			{
 				com<<"keep heartbeat fail! auto try log in after "<<OFFLINE_RETRY_INTERVAL<<"s later!\n";
@@ -221,7 +224,7 @@ void RFIDFind()
 							{
 								com<<"find new card! card quantity now:"<<CardQuantity()<<"\n";
 								CardAdd(cardValue);
-								SendCardInfo2Server();
+								SendCardInfo2Server(cardValue);
 							}
 					}
 				}
@@ -231,21 +234,6 @@ void RFIDFind()
 	}
 }
 
-void CardTimeoutCheck()
-{
-	uint8_t i=0;
-	for(;i<MAX_CARD_QUANTITY;++i)
-	{
-		if(cardInfo[i].exist == 1)
-		{
-			if(TaskManager::Time()-cardInfo[i].timestrap > MAX_CARD_NOT_READ_TIME)//指定时间段内没有读到卡，判定卡离线
-			{
-				cardInfo[i].exist = 0;
-				SendCardInfo2Server();
-			}
-		}
-	}
-}
 
 bool WriteNumber(uint8_t* number)
 {
@@ -315,24 +303,33 @@ void CardAdd(uint8_t* cardNumber)
 		}
 	}
 }
-
-void SendCardInfo2Server()
+void CardTimeoutCheck()
 {
- 	if(status != STATUS_LOGGED_IN)
-		return;
-	uint8_t cardQuantity = CardQuantity();
-	com<<"card quantity now:"<<cardQuantity<<"\n";
-	uint8_t cardId[cardQuantity*8];
-	uint8_t i=0,j=0;
+	uint8_t i=0;
 	for(;i<MAX_CARD_QUANTITY;++i)
 	{
 		if(cardInfo[i].exist == 1)
 		{
-			memcpy(cardId+j*8,cardInfo[i].cardID,8);
-			++j;
+			if(TaskManager::Time()-cardInfo[i].timestrap > MAX_CARD_NOT_READ_TIME)//指定时间段内没有读到卡，判定卡离线
+			{
+				cardInfo[i].exist = 0;
+			}
 		}
 	}
-	conn.SendCardID(cardQuantity,cardId);
+}
+void SendCardInfo2Server(uint8_t* cardNumber)
+{
+ 	if(status != STATUS_LOGGED_IN)
+		return;
+	if(TaskManager::Time()-send_heartbeat_time>SEND_HEARTBEAT_TIME_INTERVAL-2)//即将发送心跳数据，防止心跳数据和读卡信息一起发送（主要是服务器处理有问题会粘包）
+		send_heartbeat_time+=3;
+	else if(TaskManager::Time() - send_heartbeat_time <2)//刚刚发了心跳
+		TaskManager::DelayS(1);
+	static float last_send_time=TaskManager::Time();	
+	if(TaskManager::Time() - last_send_time<3)
+		TaskManager::DelayS(2);
+	conn.SendCardID(1,cardNumber);
+	last_send_time = TaskManager::Time();
 }
 
 
